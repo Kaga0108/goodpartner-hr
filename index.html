@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>好夥伴咖啡 · 人事工時表</title>
+<style>
+  :root{
+    --bg:#0E0E0E;--bg1:#161616;--ink:#E8E2D4;--inkB:#F5F1E8;--inkM:#A89E8A;
+    --line:#2A2620;--gold:#D4A24C;--goldS:#B88838;--red:#B83A2E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Noto Serif TC","PingFang TC",serif;
+    min-height:100vh;padding:32px 20px;}
+  .wrap{max-width:480px;margin:0 auto;}
+  .hdr{text-align:center;margin-bottom:32px;}
+  .seal{width:56px;height:56px;border:2px solid var(--gold);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    color:var(--gold);margin:0 auto 14px;background:rgba(184,58,46,.15);}
+  .seal .t{font-size:13px;font-weight:900;line-height:1;}
+  .seal .m{font-size:15px;font-weight:900;line-height:1;margin:2px 0;}
+  .brand-en{font-size:10px;letter-spacing:3px;color:var(--gold);font-weight:600;}
+  h1{font-size:20px;letter-spacing:3px;margin:4px 0 0;color:var(--inkB);}
+  .store-group{margin-bottom:20px;}
+  .store-title{font-size:13px;color:var(--gold);letter-spacing:2px;font-weight:700;
+    margin-bottom:8px;padding-left:4px;}
+  .link-card{display:flex;align-items:center;gap:12px;padding:16px;
+    background:var(--bg1);border:1px solid var(--line);text-decoration:none;
+    color:var(--ink);margin-bottom:8px;transition:border-color .15s;}
+  .link-card:active{border-color:var(--gold);}
+  .link-badge{background:var(--gold);color:var(--bg);width:36px;height:36px;
+    display:flex;align-items:center;justify-content:center;font-weight:900;
+    font-size:14px;flex-shrink:0;}
+  .link-name{flex:1;font-size:15px;font-weight:700;color:var(--inkB);}
+  .link-arrow{color:var(--gold);font-size:18px;}
+  .footer{text-align:center;margin-top:32px;font-size:11px;color:var(--inkM);letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="seal"><div class="t">好夥伴</div><div class="m">咖啡</div></div>
+    <div class="brand-en">GOOD PARTNER COFFEE</div>
+    <h1>人事工時表</h1>
+  </div>
+
+  <div class="store-group">
+    <div class="store-title">文山店</div>
+    <a class="link-card" href="好夥伴咖啡_文山內場.html">
+      <div class="link-badge">內</div>
+      <div class="link-name">文山店 · 內場</div>
+      <div class="link-arrow">›</div>
+    </a>
+    <a class="link-card" href="好夥伴咖啡_文山外場.html">
+      <div class="link-badge">外</div>
+      <div class="link-name">文山店 · 外場</div>
+      <div class="link-arrow">›</div>
+    </a>
+  </div>
+
+  <div class="store-group">
+    <div class="store-title">雙慈店</div>
+    <a class="link-card" href="好夥伴咖啡_雙慈內場.html">
+      <div class="link-badge">內</div>
+      <div class="link-name">雙慈店 · 內場</div>
+      <div class="link-arrow">›</div>
+    </a>
+    <a class="link-card" href="好夥伴咖啡_雙慈外場.html">
+      <div class="link-badge">外</div>
+      <div class="link-name">雙慈店 · 外場</div>
+      <div class="link-arrow">›</div>
+    </a>
+  </div>
+
+  <div class="store-group">
+    <div class="store-title">巨蛋店</div>
+    <a class="link-card" href="好夥伴咖啡_巨蛋內場.html">
+      <div class="link-badge">內</div>
+      <div class="link-name">巨蛋店 · 內場</div>
+      <div class="link-arrow">›</div>
+    </a>
+    <a class="link-card" href="好夥伴咖啡_巨蛋外場.html">
+      <div class="link-badge">外</div>
+      <div class="link-name">巨蛋店 · 外場</div>
+      <div class="link-arrow">›</div>
+    </a>
+  </div>
+
+  <div class="footer">好夥伴咖啡 · 人事管理系統</div>
+</div>
+</body>
+</html>
