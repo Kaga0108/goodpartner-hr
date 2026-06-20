@@ -825,6 +825,7 @@ async function pushToCloud(){
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight on Apps Script
       body:JSON.stringify(payload),
+      redirect:'follow',
     });
     if(!res.ok){
       setSyncStatus('error', `HTTP ${res.status} ${res.statusText}\n（伺服器有回應，但狀態碼不是 200。常見原因：部署的「誰可以存取」沒設成「所有人」）`);
@@ -844,7 +845,16 @@ async function pushToCloud(){
       setSyncStatus('error', `伺服器回傳錯誤：\n${(data&&data.error)||'未知錯誤（無 error 欄位）'}`);
     }
   } catch(e){
-    setSyncStatus('error', `瀏覽器無法送出請求（network/fetch 例外）：\n${e.message||e}\n\n常見原因：\n1. 裝置沒有網路連線\n2. Safari 的隱私權設定封鎖了跨網域請求\n3. Apps Script 網址本身已失效或部署被刪除`);
+    // Probe: try a no-cors GET to distinguish "network truly unreachable"
+    // from "CORS/redirect specifically blocked the readable fetch".
+    let probeNote = '尚未測試';
+    try{
+      await fetch(GAS_URL+'?storeKey='+encodeURIComponent(STORE_KEY), {mode:'no-cors', cache:'no-store'});
+      probeNote = '✓ no-cors 探測請求有送達（代表網路本身通，問題出在 CORS/重新導向處理，而不是斷線）';
+    } catch(probeErr){
+      probeNote = '✗ no-cors 探測請求也失敗（代表是更底層的網路/連線問題，並非單純 CORS）';
+    }
+    setSyncStatus('error', `瀏覽器無法送出請求（network/fetch 例外）：\n${e.message||e}\n\n診斷探測結果：\n${probeNote}\n\n常見原因：\n1. 裝置沒有網路連線\n2. Safari 的隱私權設定封鎖了跨網域請求\n3. Apps Script 網址本身已失效或部署被刪除\n4. Apps Script 回應的轉址過程被瀏覽器中斷`);
   } finally {
     syncInFlight=false;
   }
