@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0E0E0E">
+<title>好夥伴咖啡 · 人事工時表（文山內場）</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#0E0E0E;--bg1:#161616;--bg2:#1E1E1E;--bg3:#262626;
+  --ink:#E8E2D4;--inkB:#F5F1E8;--inkM:#A89E8A;--inkS:#7A7060;--inkF:#4A463E;
+  --line:#2A2620;--lineS:#1F1C18;--lineB:#3A352C;
+  --red:#B83A2E;--redD:#8B2820;--redL:#D14A3E;
+  --gold:#D4A24C;--goldS:#B88838;--goldD:#8B6628;
+  --green:#7A9A4A;--greenL:#9CBC5C;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Serif TC","PingFang TC",serif;-webkit-font-smoothing:antialiased;
+  font-size:16px;line-height:1.6;overscroll-behavior-y:contain;}
+body{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:110px;
+  background:radial-gradient(circle at 20% 10%,rgba(184,58,46,.06) 0%,transparent 40%),
+             radial-gradient(circle at 80% 80%,rgba(212,162,76,.04) 0%,transparent 45%),var(--bg);}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1A1814 0%,#0E0E0E 100%);padding:14px 18px 12px;
+  position:sticky;top:0;z-index:100;box-shadow:0 3px 14px rgba(0,0,0,.5);
+  border-bottom:2px solid var(--gold);overflow:hidden;}
+.hdr::before{content:'';position:absolute;top:-30px;right:-20px;width:130px;height:130px;
+  background:radial-gradient(circle,rgba(212,162,76,.15) 0%,transparent 70%);pointer-events:none;}
+.hdr-row{display:flex;align-items:center;gap:10px;position:relative;}
+.seal{width:44px;height:44px;border:2px solid var(--gold);border-radius:50%;display:flex;
+  align-items:center;justify-content:center;flex-direction:column;color:var(--gold);
+  background:rgba(184,58,46,.15);flex-shrink:0;}
+.seal .t{font-size:10px;font-weight:900;line-height:1;}
+.seal .m{font-size:12px;font-weight:900;line-height:1;margin:1px 0;letter-spacing:1px;}
+.seal .b{font-size:7px;letter-spacing:1px;font-weight:700;line-height:1;}
+.hdr-txt{flex:1;}
+.brand-en{font-size:9px;letter-spacing:3px;color:var(--gold);font-weight:600;}
+.hdr h1{margin:1px 0 0;font-size:17px;font-weight:700;letter-spacing:3px;color:var(--inkB);}
+.hdr-date{font-family:"Courier New",monospace;font-size:11px;color:var(--gold);text-align:right;flex-shrink:0;}
+.sync-row{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;
+  border-top:1px solid rgba(212,162,76,.15);cursor:pointer;position:relative;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--inkF);flex-shrink:0;
+  transition:background .3s;}
+.sync-txt{font-size:10px;color:var(--inkM);letter-spacing:1px;font-weight:600;}
+.sync-store{font-size:9px;color:var(--inkF);letter-spacing:1px;margin-left:auto;font-family:"Courier New",monospace;}
+
+/* META */
+.meta{background:var(--bg1);margin:12px;padding:13px 15px;border:1px solid var(--line);position:relative;}
+.meta::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--red) 50%,var(--gold) 50%);}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mf{display:flex;flex-direction:column;gap:3px;}
+.ml{font-size:10px;color:var(--inkS);letter-spacing:2px;font-weight:700;}
+.mi{border:none;border-bottom:1px solid var(--lineB);background:transparent;padding:5px 0;
+  font-family:inherit;font-size:14px;color:var(--inkB);outline:none;width:100%;}
+.mi::placeholder{color:var(--inkF);}
+.mi:focus{border-bottom-color:var(--gold);}
+.mi option{background:#1E1E1E;}
+
+/* TABS ROW */
+.view-toggle{display:flex;margin:0 12px 10px;border:1px solid var(--lineB);}
+.vt-btn{flex:1;padding:9px 4px;background:var(--bg1);border:none;border-right:1px solid var(--lineB);
+  font-family:inherit;font-size:12px;color:var(--inkM);cursor:pointer;font-weight:700;
+  letter-spacing:1px;transition:all .15s;}
+.vt-btn:last-child{border-right:none;}
+.vt-btn.active{background:var(--gold);color:var(--bg);}
+
+.week-tabs{display:flex;overflow-x:auto;scrollbar-width:none;margin:0 12px 10px;border:1px solid var(--lineB);}
+.week-tabs::-webkit-scrollbar{display:none;}
+.wtab{flex:1;min-width:0;padding:8px 2px;text-align:center;background:var(--bg1);
+  border:none;border-right:1px solid var(--lineB);font-family:inherit;font-size:11px;
+  color:var(--inkM);cursor:pointer;font-weight:700;letter-spacing:.5px;transition:all .15s;white-space:nowrap;}
+.wtab:last-child{border-right:none;}
+.wtab.active{background:var(--gold);color:var(--bg);}
+
+/* DAY NAV */
+.day-nav{display:flex;align-items:center;gap:8px;margin:0 12px 10px;padding:10px 12px;
+  background:var(--bg1);border:1px solid var(--lineB);}
+.dnav-btn{background:var(--bg2);border:1px solid var(--lineB);color:var(--gold);
+  width:32px;height:32px;cursor:pointer;font-size:18px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;font-family:inherit;border-radius:2px;}
+.dnav-btn:active{background:var(--bg3);}
+.dnav-info{flex:1;text-align:center;}
+.dnav-date{font-size:16px;font-weight:700;color:var(--inkB);letter-spacing:1px;}
+.dnav-dow{font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.dnav-we{color:var(--redL)!important;}
+
+/* DAILY EMPLOYEE CARD */
+.der{background:var(--bg1);margin:0 12px 8px;border:1px solid var(--line);overflow:hidden;}
+.der.is-off{opacity:.6;}
+.der-head{display:flex;align-items:center;gap:8px;padding:10px 12px;
+  background:linear-gradient(to right,#1A1814,#161310);}
+.der-badge{background:var(--gold);color:var(--bg);padding:2px 9px;font-weight:900;font-size:13px;flex-shrink:0;}
+.der-name{flex:1;font-size:14px;font-weight:700;color:var(--inkB);}
+.der-rank{font-size:10px;color:var(--gold);border:1px solid var(--goldD);
+  padding:2px 7px;letter-spacing:1px;font-weight:700;flex-shrink:0;}
+.ec-gear{background:transparent;border:none;color:var(--inkS);font-size:15px;
+  cursor:pointer;padding:2px 4px;flex-shrink:0;}
+.ec-gear:active{color:var(--gold);}
+.der-body{padding:10px 12px;}
+
+/* TIME PICKER */
+.time-picker-wrap{display:flex;flex-direction:column;gap:4px;}
+.time-lbl{font-size:9px;color:var(--inkS);letter-spacing:2px;font-weight:700;}
+.time-row{display:flex;gap:4px;align-items:center;}
+.time-text{flex:1;border:1px solid var(--lineB);background:var(--bg2);padding:7px 6px;
+  font-family:"Courier New",monospace;font-size:13px;color:var(--inkB);outline:none;
+  text-align:center;min-width:0;}
+.time-text:focus{border-color:var(--gold);background:var(--bg3);}
+.time-text::placeholder{color:var(--inkF);font-size:11px;}
+.time-text:disabled{opacity:.4;}
+.time-drop-btn{background:var(--bg2);border:1px solid var(--lineB);color:var(--gold);
+  padding:7px 7px;font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap;font-family:inherit;}
+.time-drop-btn:active{background:var(--bg3);}
+.time-drop-btn:disabled{opacity:.3;pointer-events:none;}
+
+/* Time dropdown popup */
+.time-popup{position:absolute;z-index:300;background:var(--bg2);border:1px solid var(--lineB);
+  padding:10px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.7);}
+.time-popup.show{display:flex;gap:6px;}
+.tp-col{display:flex;flex-direction:column;gap:0;}
+.tp-col-lbl{font-size:9px;color:var(--inkS);letter-spacing:2px;font-weight:700;
+  text-align:center;padding:4px 0 6px;}
+.tp-scroll{max-height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--goldD) var(--bg1);}
+.tp-scroll::-webkit-scrollbar{width:4px;}
+.tp-scroll::-webkit-scrollbar-track{background:var(--bg1);}
+.tp-scroll::-webkit-scrollbar-thumb{background:var(--goldD);}
+.tp-item{padding:7px 14px;font-family:"Courier New",monospace;font-size:13px;color:var(--inkM);
+  cursor:pointer;white-space:nowrap;text-align:center;}
+.tp-item:hover,.tp-item.sel{background:rgba(212,162,76,.15);color:var(--inkB);}
+.tp-item.sel{color:var(--gold);font-weight:700;}
+.tp-divider{width:1px;background:var(--lineB);}
+.tp-confirm{background:var(--gold);color:var(--bg);border:none;padding:8px;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;width:100%;margin-top:6px;letter-spacing:1px;}
+
+/* DAILY GRID */
+.daily-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.brk-field{display:flex;flex-direction:column;gap:4px;}
+.brk-lbl{font-size:9px;color:var(--inkS);letter-spacing:2px;font-weight:700;}
+.brk-inp{border:1px solid var(--lineB);background:var(--bg2);padding:7px 8px;
+  font-family:"Courier New",monospace;font-size:13px;color:var(--inkM);outline:none;width:100%;text-align:center;}
+.brk-inp:focus{border-color:var(--goldS);}
+.der-h-disp{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding-top:6px;}
+.der-h-lbl{font-size:10px;color:var(--inkS);letter-spacing:1px;font-weight:700;}
+.der-h-val{font-family:"Courier New",monospace;font-size:20px;font-weight:700;color:var(--gold);}
+.der-h-val.zero{color:var(--inkF);}
+.off-toggle{width:100%;padding:7px;border:1px solid var(--lineB);background:var(--bg2);
+  color:var(--inkS);font-size:11px;font-family:inherit;cursor:pointer;font-weight:700;letter-spacing:1px;margin-top:6px;}
+.off-toggle.is-off{background:var(--bg3);color:var(--inkM);border-color:var(--inkF);}
+
+/* DAILY STATS CARD */
+.daily-stats{background:var(--bg1);margin:0 12px 10px;border:1px solid var(--line);padding:13px 14px;position:relative;}
+.daily-stats::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--gold),var(--goldD));}
+.ds-title{font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.ds-avg-row{display:flex;align-items:center;gap:6px;}
+.ds-avg-lbl{font-size:10px;color:var(--inkS);font-weight:700;letter-spacing:1px;}
+.ds-avg-inp{background:var(--bg2);border:1px solid var(--lineB);padding:3px 6px;
+  font-family:"Courier New",monospace;font-size:13px;color:var(--gold);outline:none;
+  width:60px;text-align:center;}
+.ds-avg-inp:focus{border-color:var(--gold);}
+.ds-rev-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.ds-ri{display:flex;flex-direction:column;gap:4px;}
+.ds-ri-lbl{font-size:9px;color:var(--inkS);letter-spacing:1px;font-weight:700;}
+.ds-ri-inp{border:none;border-bottom:1px solid var(--lineB);background:transparent;padding:4px 0;
+  font-family:"Courier New",monospace;font-size:14px;color:var(--inkB);outline:none;width:100%;}
+.ds-ri-inp:focus{border-bottom-color:var(--gold);}
+.ds-ri-inp::placeholder{color:var(--inkF);}
+.ds-ri-val{font-family:"Courier New",monospace;font-size:15px;font-weight:700;color:var(--gold);padding-top:4px;}
+.ds-kpi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:10px;border-top:1px solid var(--line);}
+.ds-kpi{display:flex;flex-direction:column;gap:3px;}
+.ds-kpi-lbl{font-size:9px;color:var(--inkS);letter-spacing:1px;font-weight:700;}
+.ds-kpi-val{font-family:"Courier New",monospace;font-size:15px;font-weight:700;color:var(--gold);}
+.ds-kpi-val.warn{color:var(--redL);}
+
+/* ADD BUTTON */
+.add-emp-btn{display:block;width:calc(100% - 24px);margin:0 12px 10px;padding:12px;
+  border:1.5px dashed var(--goldD);background:transparent;color:var(--gold);font-family:inherit;
+  font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;text-align:center;}
+.add-emp-btn:active{background:rgba(212,162,76,.08);}
+
+/* WEEKLY VIEW */
+.wsb{margin:0 12px 10px;padding:10px 14px;background:var(--bg1);border:1px solid var(--line);
+  display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.wsb-item{display:flex;flex-direction:column;gap:2px;}
+.wsb-lbl{font-size:9px;color:var(--inkS);letter-spacing:2px;font-weight:700;}
+.wsb-val{font-family:"Courier New",monospace;font-size:15px;font-weight:700;color:var(--gold);}
+.date-hdr{margin:0 12px 6px;padding:8px 12px;
+  background:linear-gradient(to right,#1F1A14,#161310);border:1px solid var(--goldD);
+  display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
+.date-hdr-lbl{font-size:10px;color:var(--inkS);letter-spacing:2px;font-weight:700;flex:1;}
+.dchips{display:flex;gap:5px;flex-wrap:wrap;}
+.dchip{font-size:10px;color:var(--gold);font-family:"Courier New",monospace;font-weight:700;}
+.dchip.we{color:var(--redL);}
+
+.emp-card{background:var(--bg1);margin:0 12px 8px;border:1px solid var(--line);overflow:hidden;}
+.ec-head{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;user-select:none;
+  background:linear-gradient(to right,#1A1814,#161310);border-bottom:1px solid var(--lineS);}
+.ec-badge{background:var(--gold);color:var(--bg);padding:2px 9px;font-weight:900;font-size:13px;flex-shrink:0;}
+.ec-name{flex:1;font-size:14px;font-weight:700;color:var(--inkB);}
+.ec-rank{font-size:10px;color:var(--gold);border:1px solid var(--goldD);padding:2px 7px;letter-spacing:1px;font-weight:700;}
+.ec-wktot{font-family:"Courier New",monospace;font-size:13px;font-weight:700;color:var(--gold);}
+.ec-chev{width:14px;height:14px;color:var(--gold);transition:transform .2s;flex-shrink:0;}
+.emp-card.collapsed .ec-chev{transform:rotate(-90deg);}
+.emp-card.collapsed .ec-body{display:none;}
+.ec-body{padding:8px 12px;}
+.ec-col-hdr{display:grid;grid-template-columns:58px 1fr 1fr 40px 32px;gap:4px;padding:0 0 6px;}
+.ec-col-lbl{font-size:9px;color:var(--inkF);letter-spacing:1px;font-weight:700;text-align:center;}
+.ec-col-lbl:first-child{text-align:left;}
+.day-row{display:grid;grid-template-columns:58px 1fr 1fr 40px 32px;gap:4px;
+  align-items:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--lineS);}
+.day-row:last-child{border-bottom:none;margin-bottom:0;}
+.day-lbl{font-size:11px;color:var(--inkM);font-weight:700;letter-spacing:.5px;line-height:1.3;}
+.day-lbl.we{color:var(--redL);}
+.day-dt{font-size:9px;color:var(--inkF);font-family:"Courier New",monospace;}
+.wk-time-inp{border:1px solid var(--lineB);background:var(--bg2);padding:6px 3px;
+  font-family:"Courier New",monospace;font-size:11px;color:var(--inkB);outline:none;
+  width:100%;text-align:center;}
+.wk-time-inp:focus{border-color:var(--gold);}
+.wk-brk-inp{border:1px solid var(--lineB);background:var(--bg2);padding:6px 3px;
+  font-family:"Courier New",monospace;font-size:11px;color:var(--inkM);outline:none;
+  width:100%;text-align:center;}
+.dh{font-family:"Courier New",monospace;font-size:12px;font-weight:700;color:var(--gold);text-align:right;}
+.dh.zero{color:var(--inkF);}
+
+/* REV CARD */
+.rev-card{background:var(--bg1);margin:0 12px 10px;border:1px solid var(--line);padding:12px 14px;position:relative;}
+.rev-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--gold),var(--goldD));}
+.rev-title{font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:9px;}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.ri{display:flex;flex-direction:column;gap:4px;}
+.ri-lbl{font-size:9px;color:var(--inkS);letter-spacing:1px;font-weight:700;}
+.ri-inp{border:none;border-bottom:1px solid var(--lineB);background:transparent;padding:4px 0;
+  font-family:"Courier New",monospace;font-size:14px;color:var(--inkB);outline:none;width:100%;}
+.ri-inp:focus{border-bottom-color:var(--gold);}
+.ri-inp::placeholder{color:var(--inkF);}
+.ri-total{font-family:"Courier New",monospace;font-size:16px;font-weight:700;color:var(--gold);padding-top:6px;}
+
+/* SUMMARY */
+.sum-section{margin:0 12px 12px;}
+.sum-title{font-size:11px;color:var(--gold);letter-spacing:3px;font-weight:700;
+  padding:10px 14px;background:linear-gradient(to right,#1F1A14,#161310);
+  border:1px solid var(--goldD);border-bottom:none;}
+.sum-tbl{width:100%;border-collapse:collapse;background:var(--bg1);border:1px solid var(--line);font-size:12px;}
+.sum-tbl th{padding:7px 6px;font-size:9px;letter-spacing:1px;font-weight:700;color:var(--inkM);
+  border-bottom:1px solid var(--line);text-align:center;background:var(--bg2);}
+.sum-tbl th:first-child{text-align:left;}
+.sum-tbl td{padding:7px 6px;border-bottom:1px solid var(--lineS);text-align:center;
+  font-family:"Courier New",monospace;font-size:11px;color:var(--ink);}
+.sum-tbl td:first-child{font-family:inherit;font-weight:700;color:var(--inkB);text-align:left;font-size:12px;}
+.sum-tbl tr:last-child td{border-bottom:none;}
+.col-tot{color:var(--gold);font-weight:700;}
+.col-pay{color:var(--redL);font-weight:700;}
+.lv-inp{border:none;background:transparent;width:32px;text-align:center;
+  font-family:"Courier New",monospace;font-size:11px;color:var(--inkB);padding:2px;outline:none;
+  border-bottom:1px solid var(--lineB);}
+.lv-inp:focus{border-bottom-color:var(--gold);}
+.mt-card{background:var(--bg1);margin:0 12px 12px;border:1px solid var(--line);padding:14px;position:relative;}
+.mt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--red) 40%,var(--gold) 60%);}
+.mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.mt-item{display:flex;flex-direction:column;gap:3px;}
+.mt-lbl{font-size:10px;color:var(--inkS);letter-spacing:2px;font-weight:700;}
+.mt-val{font-family:"Courier New",monospace;font-size:20px;font-weight:700;color:var(--gold);}
+.mt-val.warn{color:var(--redL);}
+
+/* PANEL */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* BOTTOM BAR */
+.bot-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:2px solid var(--gold);
+  padding:10px 12px;display:flex;gap:7px;max-width:480px;margin:0 auto;z-index:95;
+  box-shadow:0 -3px 16px rgba(0,0,0,.5);}
+.btn{flex:1;padding:13px;border:none;border-radius:2px;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit;letter-spacing:1px;transition:all .15s;}
+.btn:active{transform:scale(.97);}
+.btn-sm{flex:0 0 70px;background:var(--bg2);color:var(--ink);border:1px solid var(--lineB);font-size:11px;}
+.btn-red{background:linear-gradient(135deg,var(--redL) 0%,var(--redD) 100%);color:var(--inkB);}
+.btn-gold{background:linear-gradient(135deg,var(--gold) 0%,var(--goldS) 100%);color:var(--bg);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;
+  align-items:flex-end;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--bg1);max-width:480px;width:100%;border-radius:16px 16px 0 0;
+  padding:20px;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease;border-top:3px solid var(--gold);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--gold);border-radius:2px;margin:0 auto 16px;}
+.modal h2{margin:0 0 6px;font-size:17px;letter-spacing:2px;color:var(--inkB);font-weight:700;}
+.modal p{margin:0 0 14px;font-size:12px;color:var(--inkM);}
+.mf2{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.ml2{font-size:10px;color:var(--inkS);letter-spacing:2px;font-weight:700;}
+.mi2{border:1px solid var(--lineB);background:var(--bg2);padding:10px 12px;font-family:inherit;
+  font-size:15px;color:var(--inkB);outline:none;border-radius:2px;width:100%;}
+.mi2:focus{border-color:var(--gold);}
+.mi2 option{background:#1E1E1E;}
+.mrow{display:flex;gap:8px;margin-top:4px;}
+.mbtn{flex:1;padding:13px;border:none;border-radius:2px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;}
+.mbtn-gold{background:linear-gradient(135deg,var(--gold),var(--goldS));color:var(--bg);}
+.mbtn-cancel{background:var(--bg2);color:var(--inkM);border:1px solid var(--lineB);}
+.mbtn-danger{background:var(--redD);color:var(--inkB);border:1px solid var(--red);}
+.rank-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.rp-btn{padding:10px 8px;border:1px solid var(--lineB);background:var(--bg2);
+  color:var(--inkM);font-family:inherit;font-size:12px;cursor:pointer;font-weight:700;
+  text-align:left;transition:all .15s;border-radius:2px;}
+.rp-btn.sel{background:rgba(212,162,76,.15);border-color:var(--gold);color:var(--inkB);}
+.rp-rank{font-size:13px;font-weight:700;color:var(--inkB);display:block;}
+.rp-wage{font-size:10px;color:var(--gold);font-family:"Courier New",monospace;}
+.wage-box{margin-top:6px;padding:10px 12px;background:rgba(212,162,76,.06);border:1px solid var(--goldD);}
+.wo-lbl{font-size:10px;color:var(--goldS);letter-spacing:2px;font-weight:700;margin-bottom:6px;}
+
+/* COPY MODAL */
+.copy-unit-row{display:flex;gap:6px;margin-bottom:14px;}
+.cu-btn{flex:1;padding:10px 4px;border:1px solid var(--lineB);background:var(--bg2);
+  color:var(--inkM);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+  letter-spacing:1px;transition:all .15s;text-align:center;}
+.cu-btn.active{background:var(--gold);color:var(--bg);border-color:var(--gold);}
+.copy-preview{background:var(--bg2);border:1px solid var(--lineB);padding:12px 14px;
+  font-family:"Courier New",monospace;font-size:12px;color:var(--inkM);
+  white-space:pre-wrap;line-height:1.7;max-height:320px;overflow-y:auto;
+  border-radius:2px;margin-bottom:14px;}
+.copy-preview .cp-section{color:var(--inkB);}
+.copy-preview .cp-label{color:var(--inkS);}
+.copy-preview .cp-val{color:var(--gold);}
+.copy-preview .cp-warn{color:var(--redL);}
+;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--bg3);border:1px solid var(--lineB);color:var(--inkB);padding:9px 16px;
+  font-size:12px;font-weight:700;letter-spacing:1px;z-index:999;opacity:0;
+  transition:all .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.img-prev{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;
+  display:none;flex-direction:column;align-items:center;justify-content:center;}
+.img-prev.show{display:flex;}
+.img-prev-inner{max-width:480px;width:100%;padding:20px;}
+.img-prev-inner img{width:100%;border:1px solid var(--lineB);}
+.img-prev-btns{display:flex;gap:8px;margin-top:12px;}
+#pdfRenderArea{position:fixed;left:-9999px;top:0;z-index:-1;}
+</style>
+<script>window.GP_STORE_KEY = "文山內場";</script>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-row">
+    <div class="seal"><div class="t">好夥伴</div><div class="m">咖啡</div><div class="b">HR</div></div>
+    <div class="hdr-txt">
+      <div class="brand-en">GOOD PARTNER COFFEE</div>
+      <h1>人事工時表</h1>
+    </div>
+    <div class="hdr-date" id="headerDate"></div>
+  </div>
+  <div class="sync-row" onclick="onSyncRowTap()">
+    <span class="sync-dot" id="syncDot"></span>
+    <span class="sync-txt" id="syncTxt">尚未同步</span>
+    <span class="sync-store" id="syncStoreTag"></span>
+  </div>
+</div>
+
+<div class="meta">
+  <div class="meta-grid">
+    <div class="mf"><div class="ml">年份</div><select class="mi" id="metaYear" onchange="onMetaChange()"></select></div>
+    <div class="mf"><div class="ml">月份</div><select class="mi" id="metaMonth" onchange="onMetaChange()"></select></div>
+    <div class="mf"><div class="ml">店別</div><input class="mi" id="metaStore" value="" placeholder="文山店內場"></div>
+    <div class="mf"><div class="ml">填表人</div><input class="mi" id="metaMgr" value="" placeholder="店長姓名"></div>
+  </div>
+</div>
+
+<div class="view-toggle">
+  <button class="vt-btn active" id="vtDay" onclick="setView('day')">單日出勤</button>
+  <button class="vt-btn" id="vtWeek" onclick="setView('week')">週次班表</button>
+  <button class="vt-btn" id="vtSum" onclick="setView('summary')">月度總計</button>
+</div>
+
+<div class="week-tabs" id="weekTabs"></div>
+
+<!-- DAILY PANEL -->
+<div class="panel active" id="panelDay">
+  <div class="day-nav">
+    <button class="dnav-btn" onclick="shiftDay(-1)">‹</button>
+    <div class="dnav-info">
+      <div class="dnav-date" id="dnavDate">—</div>
+      <div id="dnavDow" class="dnav-dow">—</div>
+    </div>
+    <button class="dnav-btn" onclick="shiftDay(1)">›</button>
+  </div>
+  <div id="dailyStats"></div>
+  <div id="dailyList"></div>
+  <button class="add-emp-btn" onclick="showAddModal()">＋ 新增員工</button>
+</div>
+
+<!-- WEEKLY PANEL -->
+<div class="panel" id="panelWeek">
+  <div class="wsb" id="weekSumBar"></div>
+  <div class="date-hdr" id="weekDateHdr"></div>
+  <div id="weekEmpList"></div>
+  <button class="add-emp-btn" onclick="showAddModal()">＋ 新增員工</button>
+  <div id="weekRevCard"></div>
+</div>
+
+<!-- SUMMARY PANEL -->
+<div class="panel" id="panelSum">
+  <div class="sum-section">
+    <div class="sum-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>月度工時總計</span>
+      <span id="stdHNote" style="font-size:9px;color:var(--inkM);letter-spacing:0;font-weight:400;"></span>
+    </div>
+    <table class="sum-tbl">
+      <thead><tr>
+        <th>人員</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th><th>W5</th>
+        <th>總h</th>
+        <th>年假<br><span style="font-weight:400;opacity:.7">天</span></th>
+        <th>公假<br><span style="font-weight:400;opacity:.7">天</span></th>
+        <th>病假<br><span style="font-weight:400;opacity:.7">h</span></th>
+        <th>支援<br><span style="font-weight:400;opacity:.7">h</span></th>
+        <th>實計h</th><th>薪水</th>
+      </tr></thead>
+      <tbody id="sumBody"></tbody>
+    </table>
+  </div>
+  <div class="mt-card">
+    <div class="mt-grid">
+      <div class="mt-item"><div class="mt-lbl">本月總工時</div><div class="mt-val" id="mtH">0.0h</div></div>
+      <div class="mt-item"><div class="mt-lbl">本月總薪資</div><div class="mt-val" id="mtPay">$0</div></div>
+      <div class="mt-item"><div class="mt-lbl">本月總營業額</div><div class="mt-val" id="mtRev">$0</div></div>
+      <div class="mt-item"><div class="mt-lbl">人事占比</div><div class="mt-val warn" id="mtRatio">—</div></div>
+    </div>
+  </div>
+  <button class="add-emp-btn" onclick="showAddModal()">＋ 新增員工</button>
+</div>
+
+<div class="bot-bar">
+  <button class="btn btn-sm" onclick="showAddModal()">＋人員</button>
+  <button class="btn btn-red" onclick="generateReport()">截圖報告</button>
+  <button class="btn btn-gold" onclick="openCopyModal()">複製摘要</button>
+  <button class="btn btn-sm" onclick="showResetModal()" style="color:var(--redL);border-color:var(--redD);">重置</button>
+</div>
+
+<!-- EMP MODAL -->
+<div class="modal-bg" id="empModal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <h2 id="empModalTitle">新增員工</h2>
+
+  <!-- Batch mode indicator -->
+  <div id="batchBar" style="display:none;background:rgba(212,162,76,.1);border:1px solid var(--goldD);
+    padding:8px 12px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;">連續輸入模式</span>
+    <span id="batchCount" style="font-family:'Courier New',monospace;font-size:12px;color:var(--inkM);flex:1;"></span>
+    <button onclick="closeBatchMode()" style="background:transparent;border:none;color:var(--inkS);
+      font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">結束</button>
+  </div>
+
+  <!-- Added list (batch mode) -->
+  <div id="batchList" style="display:none;margin-bottom:12px;max-height:120px;overflow-y:auto;"></div>
+
+  <p id="empModalDesc" style="margin:0 0 14px;font-size:12px;color:var(--inkM);">設定姓名、職級與薪資。</p>
+  <div class="mf2"><div class="ml2">員工姓名</div><input class="mi2" id="empName" placeholder="例：小凱" autofocus></div>
+  <div class="mf2">
+    <div class="ml2">員工類型</div>
+    <select class="mi2" id="empType" onchange="onEmpTypeChange()">
+      <option value="full">正職員工</option>
+      <option value="part">兼職員工</option>
+    </select>
+  </div>
+  <div id="fullSection">
+    <div class="ml2" style="margin-bottom:8px;">職級</div>
+    <div class="rank-grid" id="rankGrid"></div>
+    <div class="wage-box">
+      <div class="wo-lbl">底薪（可手動調整）</div>
+      <input class="mi2" id="empWageFull" type="number" placeholder="例：40000" style="margin-top:4px;">
+    </div>
+  </div>
+  <div id="partSection" style="display:none;">
+    <div class="mf2"><div class="ml2">時薪（元）</div><input class="mi2" id="empWagePart" type="number" placeholder="例：200"></div>
+  </div>
+
+  <!-- Normal mode buttons -->
+  <div id="normalBtns" class="mrow">
+    <button class="mbtn mbtn-cancel" onclick="closeEmpModal()">取消</button>
+    <button class="mbtn mbtn-gold" onclick="saveEmp(false)">儲存</button>
+    <button class="mbtn" style="background:var(--bg2);color:var(--gold);border:1px solid var(--goldD);"
+      onclick="startBatchMode()">連續輸入</button>
+  </div>
+
+  <!-- Batch mode buttons -->
+  <div id="batchBtns" class="mrow" style="display:none;">
+    <button class="mbtn mbtn-cancel" onclick="closeBatchMode()">完成</button>
+    <button class="mbtn mbtn-gold" onclick="saveEmp(true)" id="batchNextBtn">儲存，下一位 ›</button>
+  </div>
+
+  <div id="empDelRow" style="display:none;margin-top:8px;">
+    <button class="mbtn mbtn-danger" onclick="deleteEmp()" style="width:100%;">刪除此員工</button>
+  </div>
+</div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="modal-bg" id="resetModal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <h2 style="color:var(--redL);">資料重置</h2>
+  <p>選擇要清除的範圍。員工名單與薪資設定不受影響。</p>
+  <div style="background:var(--bg2);border:1px solid var(--lineB);padding:14px;margin-bottom:16px;">
+    <div style="font-size:11px;color:var(--inkM);margin-bottom:10px;letter-spacing:1px;">將會清除：</div>
+    <div style="font-size:13px;color:var(--ink);line-height:2;">
+      ✕ &nbsp;所有出勤打卡紀錄（上下班時間）<br>
+      ✕ &nbsp;所有每日營業額<br>
+      ✕ &nbsp;所有假別紀錄（年假、公假、病假、支援）
+    </div>
+    <div style="font-size:11px;color:var(--inkS);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);line-height:1.8;">
+      ✓ &nbsp;員工名單保留<br>
+      ✓ &nbsp;職級與薪資設定保留<br>
+      ✓ &nbsp;平均時薪設定保留
+    </div>
+  </div>
+  <div style="background:rgba(184,58,46,.08);border:1px solid var(--redD);padding:10px 14px;
+    margin-bottom:16px;font-size:12px;color:var(--redL);letter-spacing:.5px;">
+    ⚠ 此操作無法還原，請確認後再執行。
+  </div>
+  <div class="mrow">
+    <button class="mbtn mbtn-cancel" onclick="closeResetModal()">取消</button>
+    <button class="mbtn mbtn-danger" onclick="confirmReset()">確認重置</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-bg" id="loadModal">
+  <div class="modal" style="text-align:center;padding:36px 20px;">
+    <div style="font-size:13px;color:var(--gold);letter-spacing:3px;font-weight:700;">產生報告中…</div>
+  </div>
+</div>
+
+<div class="img-prev" id="imgPreview">
+  <div class="img-prev-inner">
+    <img id="prevImg" src="" alt="">
+    <div class="img-prev-btns">
+      <button class="btn btn-sm" onclick="closeImgPreview()" style="flex:0 0 72px;">關閉</button>
+      <a id="dlBtn" class="btn btn-gold" style="flex:1;text-align:center;text-decoration:none;padding:13px;display:block;">長按圖片儲存</a>
+    </div>
+  </div>
+</div>
+
+<!-- COPY MODAL -->
+<div class="modal-bg" id="copyModal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <h2>複製摘要</h2>
+  <p>選擇單位後確認內容，再點複製。</p>
+  <div class="copy-unit-row">
+    <button class="cu-btn active" id="cuDay" onclick="setCopyUnit('day')">以日為單位</button>
+    <button class="cu-btn" id="cuWeek" onclick="setCopyUnit('week')">以週為單位</button>
+    <button class="cu-btn" id="cuMonth" onclick="setCopyUnit('month')">以月為單位</button>
+  </div>
+  <div class="copy-preview" id="copyPreview"></div>
+  <div class="mrow">
+    <button class="mbtn mbtn-cancel" onclick="closeCopyModal()">取消</button>
+    <button class="mbtn mbtn-gold" onclick="confirmCopy()">確認複製</button>
+  </div>
+</div>
+</div>
+
+<div id="pdfRenderArea"></div>
+<div class="toast" id="toastEl"></div>
+
+<!-- TIME POPUP (singleton) -->
+<div class="time-popup" id="timePopup">
+  <div class="tp-col">
+    <div class="tp-col-lbl">時</div>
+    <div class="tp-scroll" id="tpHours"></div>
+  </div>
+  <div class="tp-divider"></div>
+  <div class="tp-col">
+    <div class="tp-col-lbl">分</div>
+    <div class="tp-scroll" id="tpMins"></div>
+  </div>
+  <div class="tp-col" style="display:flex;flex-direction:column;justify-content:flex-end;">
+    <button class="tp-confirm" onclick="confirmTimePop()">確認</button>
+  </div>
+</div>
+
+<script>
+// ─── CONSTANTS ───
+const RANKS=[
+  {key:'mgr',   label:'店長/副店長', wage:60000},
+  {key:'lead',  label:'組長',        wage:47000},
+  {key:'sup',   label:'儲備幹部',    wage:42000},
+  {key:'shift', label:'值班主管',    wage:40000},
+  {key:'full',  label:'正職',        wage:38000},
+  {key:'jfull', label:'儲備正職',    wage:34000},
+];
+const DOW_FULL=['星期一','星期二','星期三','星期四','星期五','星期六','星期日'];
+const DOW_SHORT=['一','二','三','四','五','六','日'];
+
+// ─── STATE ───
+let S={
+  year:new Date().getFullYear(),
+  month:new Date().getMonth()+1,
+  view:'day',
+  curWeek:0,
+  curDay:0,  // 0-6 within curWeek
+  avgWage:230,
+  employees:[],
+  att:{},    // att[week][empId][dayOfWeek] = {in,out,brk,off}
+  dailyRev:{}, // dailyRev[week][dayOfWeek] = {barley,cloud}
+  leaves:{}, // leaves[empId]={annual(天),public(天),sick(h),support(h)}
+};
+let editEmpId=null, selRankKey=null;
+let isBatchMode=false, batchAdded=[];
+let tpTarget=null, tpSelH=null, tpSelM=null; // time popup state
+
+// ─── CALENDAR HELPERS ───
+// Returns array of 5 weeks, each week = array of 7 Date objects
+// Week 0 starts on the first day of the month (could be any DOW)
+// We anchor by real calendar: week i = days 7i+1 .. 7i+7 of the month
+function getWeeks(y,m){
+  const weeks=[];
+  for(let w=0;w<5;w++){
+    const wk=[];
+    for(let d=0;d<7;d++) wk.push(new Date(y,m-1,1+w*7+d));
+    weeks.push(wk);
+  }
+  return weeks;
+}
+// Returns which week index and day index a given Date falls in
+function dateToWeekDay(y,m,date){
+  const dayOfMonth=date.getDate();
+  const w=Math.floor((dayOfMonth-1)/7);
+  const d=(dayOfMonth-1)%7;
+  return {w,d};
+}
+function getDate(w,d){
+  return new Date(S.year,S.month-1,1+w*7+d);
+}
+function fmt(date){return `${date.getMonth()+1}/${date.getDate()}`;}
+function isWE(date){const dw=date.getDay();return dw===0||dw===6;}
+// Real weekday name based on actual date
+function dowName(date){
+  const dw=date.getDay(); // 0=Sun
+  const map=['日','一','二','三','四','五','六'];
+  return map[dw];
+}
+function dowFull(date){
+  const dw=date.getDay();
+  return ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][dw];
+}
+
+// ─── DATA HELPERS ───
+function getAtt(w,eid,d){
+  if(!S.att[w])S.att[w]={};
+  if(!S.att[w][eid])S.att[w][eid]={};
+  if(!S.att[w][eid][d])S.att[w][eid][d]={in:'',out:'',brk:'0',off:false};
+  return S.att[w][eid][d];
+}
+function getDailyRev(w,d){
+  if(!S.dailyRev[w])S.dailyRev[w]={};
+  if(!S.dailyRev[w][d])S.dailyRev[w][d]={barley:'',cloud:''};
+  return S.dailyRev[w][d];
+}
+function getLv(eid){
+  if(!S.leaves[eid])S.leaves[eid]={annual:'',public:'',sick:'',support:''};
+  return S.leaves[eid];
+}
+// 當月標準工時基準 = (當月天數 - 8) * 8
+function monthStdH(){
+  const days=new Date(S.year,S.month,0).getDate(); // days in month
+  return (days-8)*8;
+}
+function calcH(inT,outT,brk){
+  if(!inT||!outT)return 0;
+  const[ih,im]=inT.split(':').map(Number);
+  const[oh,om]=outT.split(':').map(Number);
+  if(isNaN(ih)||isNaN(oh))return 0;
+  const mins=(oh*60+om)-(ih*60+im);
+  if(mins<=0)return 0;
+  return Math.max(0,mins/60-(parseFloat(brk)||0));
+}
+function empWeekH(eid,w){
+  let t=0;for(let d=0;d<7;d++){const a=getAtt(w,eid,d);if(!a.off)t+=calcH(a.in,a.out,a.brk);}
+  return t;
+}
+function empMonthH(eid){let t=0;for(let w=0;w<5;w++)t+=empWeekH(eid,w);return t;}
+function empEffH(eid){
+  const lv=getLv(eid);
+  const rawH=empMonthH(eid);
+  const annualH=(parseFloat(lv.annual)||0)*8;   // 天 → 小時
+  const publicH=(parseFloat(lv.public)||0)*8;   // 天 → 小時
+  const sickH=(parseFloat(lv.sick)||0);          // 已是小時
+  const supportH=(parseFloat(lv.support)||0);    // 已是小時
+  return rawH+annualH+publicH+sickH+supportH;
+}
+function empPay(emp){
+  if(emp.type==='part'){
+    // 兼職：當月總時數（含假）× 時薪
+    return empEffH(emp.id)*emp.wage;
+  }
+  // 正職
+  const stdH=monthStdH();
+  const effH=empEffH(emp.id);
+  if(effH<=stdH){
+    // 未超時 → 固定底薪
+    return emp.wage;
+  } else {
+    // 超時加班
+    const otH=effH-stdH;
+    const hourlyRate=emp.wage/stdH;
+    return emp.wage+otH*hourlyRate;
+  }
+}
+function weekTotH(w){return S.employees.reduce((s,e)=>s+empWeekH(e.id,w),0);}
+function weekRev(w){
+  let t=0;
+  for(let d=0;d<7;d++){const r=getDailyRev(w,d);t+=(parseFloat(r.barley)||0)+(parseFloat(r.cloud)||0);}
+  return t;
+}
+function monthTotRev(){let t=0;for(let w=0;w<5;w++)t+=weekRev(w);return t;}
+function monthTotPay(){return S.employees.reduce((s,e)=>s+empPay(e),0);}
+function rankLabel(emp){
+  if(emp.type==='part')return `時薪$${emp.wage}`;
+  const r=RANKS.find(r=>r.key===emp.rank);return r?r.label:'正職';
+}
+// Daily totals
+function dayTotH(w,d){
+  return S.employees.reduce((s,e)=>{const a=getAtt(w,e.id,d);return s+(a.off?0:calcH(a.in,a.out,a.brk));},0);
+}
+function dayTotRev(w,d){const r=getDailyRev(w,d);return (parseFloat(r.barley)||0)+(parseFloat(r.cloud)||0);}
+
+// ─── INIT ───
+// ─── PERSISTENCE ───
+const STORAGE_KEY='gp_hr_state_v1';
+const GAS_URL='https://script.google.com/macros/s/AKfycbztTZntwdObL6xSzlUsrRK__dW2a5_eyS5pNH80Pt8vHEt-e3Oc7Y4xHYbdmMpRsSdF/exec';
+const STORE_KEY=window.GP_STORE_KEY || '未設定店別'; // injected per-store at build time
+
+let syncTimer=null;
+let syncInFlight=false;
+
+let lastSyncError='';
+
+function setSyncStatus(state, detail){
+  // state: 'idle' | 'syncing' | 'ok' | 'error' | 'offline'
+  const el=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!el||!txt)return;
+  const map={
+    idle:    {color:'var(--inkF)', label:'尚未同步'},
+    syncing: {color:'var(--gold)', label:'同步中…'},
+    ok:      {color:'var(--green,#7A9A4A)', label:'已同步'},
+    error:   {color:'var(--redL)', label:'同步失敗（點此查看原因）'},
+    offline: {color:'var(--inkF)', label:'本機模式'},
+  };
+  const cfg=map[state]||map.idle;
+  el.style.background=cfg.color;
+  txt.textContent=cfg.label;
+  if(state==='error'&&detail) lastSyncError=detail;
+}
+
+function showSyncDebug(){
+  if(lastSyncError){
+    alert('同步失敗原因：\n\n'+lastSyncError+'\n\n────────\nGAS網址：\n'+GAS_URL+'\n\n店別代碼：'+STORE_KEY);
+  } else {
+    alert('目前沒有錯誤訊息可顯示。\n\nGAS網址：\n'+GAS_URL+'\n\n店別代碼：'+STORE_KEY+'\n\n狀態：'+(document.getElementById('syncTxt')?.textContent||''));
+  }
+}
+
+function saveState(){
+  try{
+    const snap={
+      year:S.year, month:S.month, view:S.view,
+      curWeek:S.curWeek, curDay:S.curDay, avgWage:S.avgWage,
+      employees:S.employees,
+      att:S.att, dailyRev:S.dailyRev, leaves:S.leaves,
+      store:document.getElementById('metaStore')?.value||'',
+      mgr:document.getElementById('metaMgr')?.value||'',
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(snap));
+  } catch(e){ /* storage full or unavailable — silent fail */ }
+  scheduleCloudSync();
+}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return;
+    const snap=JSON.parse(raw);
+    if(snap.year)  S.year=snap.year;
+    if(snap.month) S.month=snap.month;
+    if(snap.view)  S.view=snap.view;
+    if(snap.curWeek!=null) S.curWeek=snap.curWeek;
+    if(snap.curDay!=null)  S.curDay=snap.curDay;
+    if(snap.avgWage)       S.avgWage=snap.avgWage;
+    if(Array.isArray(snap.employees)) S.employees=snap.employees;
+    if(snap.att)      S.att=snap.att;
+    if(snap.dailyRev) S.dailyRev=snap.dailyRev;
+    if(snap.leaves)   S.leaves=snap.leaves;
+    // restore meta fields after DOM ready
+    if(snap.store!=null) setTimeout(()=>{const el=document.getElementById('metaStore');if(el)el.value=snap.store;},0);
+    if(snap.mgr!=null)   setTimeout(()=>{const el=document.getElementById('metaMgr');if(el)el.value=snap.mgr;},0);
+  } catch(e){ /* corrupted storage — ignore */ }
+}
+
+// Debounce cloud writes so rapid typing doesn't spam the API
+function scheduleCloudSync(){
+  if(!GAS_URL || GAS_URL.indexOf('YOUR_')===0){setSyncStatus('offline');return;}
+  setSyncStatus('syncing');
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(pushToCloud, 1200);
+}
+
+async function pushToCloud(){
+  if(syncInFlight){ syncTimer=setTimeout(pushToCloud,1200); return; }
+  syncInFlight=true;
+  try{
+    const payload={
+      storeKey: STORE_KEY,
+      year:S.year, month:S.month, avgWage:S.avgWage,
+      store:document.getElementById('metaStore')?.value||'',
+      mgr:document.getElementById('metaMgr')?.value||'',
+      employees:S.employees, att:S.att, dailyRev:S.dailyRev, leaves:S.leaves,
+    };
+    const res=await fetch(GAS_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight on Apps Script
+      body:JSON.stringify(payload),
+    });
+    if(!res.ok){
+      setSyncStatus('error', `HTTP ${res.status} ${res.statusText}\n（伺服器有回應，但狀態碼不是 200。常見原因：部署的「誰可以存取」沒設成「所有人」）`);
+      return;
+    }
+    let data;
+    try{
+      data = await res.json();
+    } catch(parseErr){
+      const raw = await res.text().catch(()=> '(無法讀取內容)');
+      setSyncStatus('error', `回應不是有效的 JSON。\n伺服器回傳內容開頭：\n${raw.slice(0,300)}\n\n常見原因：網址要求 Google 登入，或顯示 HTML 錯誤頁，而非 Apps Script 的 JSON 輸出。`);
+      return;
+    }
+    if(data && data.ok){
+      setSyncStatus('ok');
+    } else {
+      setSyncStatus('error', `伺服器回傳錯誤：\n${(data&&data.error)||'未知錯誤（無 error 欄位）'}`);
+    }
+  } catch(e){
+    setSyncStatus('error', `瀏覽器無法送出請求（network/fetch 例外）：\n${e.message||e}\n\n常見原因：\n1. 裝置沒有網路連線\n2. Safari 的隱私權設定封鎖了跨網域請求\n3. Apps Script 網址本身已失效或部署被刪除`);
+  } finally {
+    syncInFlight=false;
+  }
+}
+
+async function pullFromCloud(){
+  if(!GAS_URL || GAS_URL.indexOf('YOUR_')===0){setSyncStatus('offline');return false;}
+  try{
+    setSyncStatus('syncing');
+    const url=GAS_URL+'?storeKey='+encodeURIComponent(STORE_KEY);
+    const res=await fetch(url);
+    const data=await res.json();
+    if(data && data.ok && data.data){
+      const d=data.data;
+      if(d.year)S.year=d.year;
+      if(d.month)S.month=d.month;
+      if(d.avgWage)S.avgWage=d.avgWage;
+      if(Array.isArray(d.employees))S.employees=d.employees;
+      if(d.att)S.att=d.att;
+      if(d.dailyRev)S.dailyRev=d.dailyRev;
+      if(d.leaves)S.leaves=d.leaves;
+      if(d.store!=null)setTimeout(()=>{const el=document.getElementById('metaStore');if(el)el.value=d.store;},0);
+      if(d.mgr!=null)setTimeout(()=>{const el=document.getElementById('metaMgr');if(el)el.value=d.mgr;},0);
+      setSyncStatus('ok');
+      return true;
+    }
+    setSyncStatus('idle');
+    return false;
+  } catch(e){
+    setSyncStatus('error', `下載資料失敗（network/fetch 例外）：\n${e.message||e}`);
+    return false;
+  }
+}
+
+function onSyncRowTap(){
+  if(lastSyncError){
+    showSyncDebug();
+  } else {
+    manualSync();
+  }
+}
+
+function manualSync(){
+  showToast('正在從雲端拉取最新資料…');
+  pullFromCloud().then(got=>{
+    if(got){ saveStateLocalOnly(); renderAll(); showToast('✓ 已套用雲端最新資料'); }
+    else { showToast('雲端暫無資料或連線失敗'); }
+  });
+}
+function saveStateLocalOnly(){
+  try{
+    const snap={
+      year:S.year, month:S.month, view:S.view,
+      curWeek:S.curWeek, curDay:S.curDay, avgWage:S.avgWage,
+      employees:S.employees, att:S.att, dailyRev:S.dailyRev, leaves:S.leaves,
+      store:document.getElementById('metaStore')?.value||'',
+      mgr:document.getElementById('metaMgr')?.value||'',
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(snap));
+  }catch(e){}
+}
+
+function init(){
+  const now=new Date();
+  document.getElementById('headerDate').innerHTML=
+    `${now.getFullYear()}<br>${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+  document.getElementById('syncStoreTag').textContent=STORE_KEY;
+
+  loadState(); // ← restore before building selects
+
+  const ySel=document.getElementById('metaYear');
+  for(let y=2024;y<=2030;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'年';if(y===S.year)o.selected=true;ySel.appendChild(o);}
+  const mSel=document.getElementById('metaMonth');
+  for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'月';if(m===S.month)o.selected=true;mSel.appendChild(o);}
+
+  buildRankGrid();
+  buildTimePopup();
+
+  // Auto-save on meta field changes
+  document.getElementById('metaStore').addEventListener('input', saveState);
+  document.getElementById('metaMgr').addEventListener('input', saveState);
+
+  renderAll();
+
+  // Try pulling latest cloud data on startup (cloud is source of truth across devices)
+  pullFromCloud().then(got=>{
+    if(got){ saveStateLocalOnly(); renderAll(); }
+  });
+}
+function onMetaChange(){
+  S.year=parseInt(document.getElementById('metaYear').value);
+  S.month=parseInt(document.getElementById('metaMonth').value);
+  saveState();
+  renderAll();
+}
+
+// ─── VIEW SWITCH ───
+function setView(v){
+  S.view=v;
+  ['Day','Week','Sum'].forEach(k=>{
+    const vk=k==='Sum'?'Sum':k;
+    document.getElementById('vt'+vk).classList.toggle('active',
+      (k==='Day'&&v==='day')||(k==='Week'&&v==='week')||(k==='Sum'&&v==='summary'));
+  });
+  document.getElementById('panelDay').classList.toggle('active',v==='day');
+  document.getElementById('panelWeek').classList.toggle('active',v==='week');
+  document.getElementById('panelSum').classList.toggle('active',v==='summary');
+  document.getElementById('weekTabs').style.display=(v==='day'||v==='week')?'flex':'none';
+  saveState();
+  renderCurrent();
+}
+function renderAll(){renderTabs();renderCurrent();}
+function renderCurrent(){
+  if(S.view==='day')renderDay();
+  else if(S.view==='week')renderWeek();
+  else renderSummary();
+}
+function renderTabs(){
+  const c=document.getElementById('weekTabs');c.innerHTML='';
+  for(let i=0;i<5;i++){
+    const b=document.createElement('button');
+    b.className='wtab'+(S.curWeek===i?' active':'');
+    b.textContent=`第${i+1}週`;
+    b.onclick=(wi=>()=>{S.curWeek=wi;S.curDay=0;saveState();renderAll();})(i);
+    c.appendChild(b);
+  }
+  c.style.display=(S.view==='day'||S.view==='week')?'flex':'none';
+}
+
+// ─── DAILY VIEW ───
+function shiftDay(delta){
+  let d=S.curDay+delta;
+  if(d<0){if(S.curWeek>0){S.curWeek--;d=6;}else d=0;}
+  else if(d>6){if(S.curWeek<4){S.curWeek++;d=0;}else d=6;}
+  S.curDay=d;
+  saveState();
+  renderTabs();renderDay();
+}
+function renderDay(){
+  const w=S.curWeek,d=S.curDay;
+  const date=getDate(w,d);
+  const we=isWE(date);
+  document.getElementById('dnavDate').textContent=
+    `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
+  const dowEl=document.getElementById('dnavDow');
+  dowEl.textContent=dowFull(date);
+  dowEl.className='dnav-dow'+(we?' dnav-we':'');
+  renderDailyStats(w,d);
+  const list=document.getElementById('dailyList');
+  list.innerHTML='';
+  S.employees.forEach(emp=>list.appendChild(buildDailyRow(emp,w,d)));
+}
+
+function renderDailyStats(w,d){
+  const totH=dayTotH(w,d);
+  const rev=getDailyRev(w,d);
+  const barley=parseFloat(rev.barley)||0;
+  const cloud=parseFloat(rev.cloud)||0;
+  const totRev=barley+cloud;
+  const avgW=S.avgWage;
+  // 人事成本 = (totH * avgW) / totRev * 100 %
+  const laborCost=totRev>0?((totH*avgW)/totRev*100):null;
+  // 人均產值 = totRev / (totH/8)
+  const headcount=totH>0?(totH/8):null;
+  const perPerson=headcount&&totRev>0?(totRev/headcount):null;
+
+  document.getElementById('dailyStats').innerHTML=`
+    <div class="daily-stats">
+      <div class="ds-title">
+        <span>每日營業額 &amp; 績效</span>
+        <div class="ds-avg-row">
+          <span class="ds-avg-lbl">平均時薪</span>
+          <input class="ds-avg-inp" type="number" value="${avgW}" id="avgWageInp"
+            onchange="onAvgWageChange(this.value)" title="平均時薪（用於人事成本計算）">
+        </div>
+      </div>
+      <div class="ds-rev-grid">
+        <div class="ds-ri">
+          <div class="ds-ri-lbl">大麥營業額</div>
+          <input class="ds-ri-inp" type="number" placeholder="0" value="${rev.barley}"
+            onchange="onDailyRevChange(${w},${d},'barley',this.value)" id="dRevBarley_${w}_${d}">
+        </div>
+        <div class="ds-ri">
+          <div class="ds-ri-lbl">雲端營業額</div>
+          <input class="ds-ri-inp" type="number" placeholder="0" value="${rev.cloud}"
+            onchange="onDailyRevChange(${w},${d},'cloud',this.value)" id="dRevCloud_${w}_${d}">
+        </div>
+        <div class="ds-ri">
+          <div class="ds-ri-lbl">當日合計</div>
+          <div class="ds-ri-val" id="dRevTot_${w}_${d}">$${totRev.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="ds-kpi-grid">
+        <div class="ds-kpi">
+          <div class="ds-kpi-lbl">總出勤時數</div>
+          <div class="ds-kpi-val" id="dKpiH_${w}_${d}">${totH.toFixed(1)}h</div>
+        </div>
+        <div class="ds-kpi">
+          <div class="ds-kpi-lbl">人事成本占比</div>
+          <div class="ds-kpi-val${laborCost&&laborCost>35?' warn':''}" id="dKpiLC_${w}_${d}">${laborCost?laborCost.toFixed(1)+'%':'—'}</div>
+        </div>
+        <div class="ds-kpi">
+          <div class="ds-kpi-lbl">人均產值</div>
+          <div class="ds-kpi-val" id="dKpiPP_${w}_${d}">${perPerson?'$'+Math.round(perPerson).toLocaleString():'—'}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function onAvgWageChange(val){S.avgWage=parseFloat(val)||230;saveState();refreshDailyKPI(S.curWeek,S.curDay);}
+
+function onDailyRevChange(w,d,field,val){
+  const r=getDailyRev(w,d);r[field]=val;
+  saveState();
+  refreshDailyKPI(w,d);
+  if(S.view==='week')renderRevCard('weekRevCard',w);
+}
+
+function refreshDailyKPI(w,d){
+  const totH=dayTotH(w,d);
+  const r=getDailyRev(w,d);
+  const totRev=(parseFloat(r.barley)||0)+(parseFloat(r.cloud)||0);
+  const avgW=S.avgWage;
+  const laborCost=totRev>0?((totH*avgW)/totRev*100):null;
+  const headcount=totH>0?(totH/8):null;
+  const perPerson=headcount&&totRev>0?(totRev/headcount):null;
+  el(`dRevTot_${w}_${d}`,'$'+totRev.toLocaleString());
+  el(`dKpiH_${w}_${d}`,totH.toFixed(1)+'h');
+  const lcEl=document.getElementById(`dKpiLC_${w}_${d}`);
+  if(lcEl){lcEl.textContent=laborCost?laborCost.toFixed(1)+'%':'—';
+    lcEl.className='ds-kpi-val'+(laborCost&&laborCost>35?' warn':'');}
+  el(`dKpiPP_${w}_${d}`,perPerson?'$'+Math.round(perPerson).toLocaleString():'—');
+}
+function el(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
+
+function buildDailyRow(emp,w,d){
+  const a=getAtt(w,emp.id,d);
+  const h=a.off?0:calcH(a.in,a.out,a.brk);
+  const card=document.createElement('div');
+  card.className='der'+(a.off?' is-off':'');
+  card.id=`der_${w}_${emp.id}_${d}`;
+  card.innerHTML=`
+    <div class="der-head">
+      <div class="der-badge">${emp.name.charAt(0)}</div>
+      <div class="der-name">${emp.name}</div>
+      <div class="der-rank">${rankLabel(emp)}</div>
+      <button class="ec-gear" onclick="showEditModal('${emp.id}')">⚙</button>
+    </div>
+    <div class="der-body">
+      <div class="daily-grid">
+        ${buildTimePicker(`tin_${w}_${emp.id}_${d}`,'上班時間',a.off?'':a.in,a.off,`onTimeEdit('${w}','${emp.id}','${d}','in',this.value)`)}
+        ${buildTimePicker(`tout_${w}_${emp.id}_${d}`,'下班時間',a.off?'':a.out,a.off,`onTimeEdit('${w}','${emp.id}','${d}','out',this.value)`)}
+      </div>
+      <div class="daily-grid">
+        <div class="brk-field">
+          <div class="brk-lbl">休息時數</div>
+          <input class="brk-inp" type="number" min="0" max="4" step="0.5"
+            value="${a.off?'':a.brk}" placeholder="0" ${a.off?'disabled':''}
+            onchange="onTimeEdit('${w}','${emp.id}','${d}','brk',this.value)">
+        </div>
+        <div class="brk-field">
+          <div class="brk-lbl">今日時數</div>
+          <div class="der-h-val${h===0?' zero':''}" id="dH_${w}_${emp.id}_${d}" style="padding-top:7px;">
+            ${h===0?'—':h.toFixed(1)+'h'}
+          </div>
+        </div>
+      </div>
+      <button class="off-toggle${a.off?' is-off':''}" id="offBtn_${w}_${emp.id}_${d}"
+        onclick="toggleOff('${w}','${emp.id}','${d}')">
+        ${a.off?'✓ 休假 / 未出勤（點擊取消）':'標記休假 / 未出勤'}
+      </button>
+    </div>`;
+  return card;
+}
+
+function buildTimePicker(inputId,label,val,disabled,onchangeAttr){
+  return `<div class="time-picker-wrap">
+    <div class="time-lbl">${label}</div>
+    <div class="time-row">
+      <input class="time-text" type="text" id="${inputId}" value="${val}" placeholder="--:--"
+        ${disabled?'disabled':''} maxlength="5" inputmode="numeric"
+        onchange="${onchangeAttr}" oninput="formatTimeInput(this)">
+      <button class="time-drop-btn" ${disabled?'disabled':''} onclick="openTimePop('${inputId}',event)">▾</button>
+    </div>
+  </div>`;
+}
+
+function formatTimeInput(inp){
+  let v=inp.value.replace(/[^0-9]/g,'');
+  if(v.length>=3)v=v.slice(0,2)+':'+v.slice(2,4);
+  inp.value=v;
+}
+
+function onTimeEdit(w,eid,d,field,val){
+  const a=getAtt(parseInt(w),eid,parseInt(d));
+  // validate HH:MM
+  if(field==='in'||field==='out'){
+    const clean=val.trim();
+    if(clean&&!/^\d{1,2}:\d{2}$/.test(clean))return;
+    a[field]=clean;
+  } else {
+    a[field]=val;
+  }
+  const h=calcH(a.in,a.out,a.brk);
+  const hEl=document.getElementById(`dH_${w}_${eid}_${d}`);
+  if(hEl){hEl.textContent=h===0?'—':h.toFixed(1)+'h';hEl.className='der-h-val'+(h===0?' zero':'');}
+  refreshDailyKPI(parseInt(w),parseInt(d));
+  // sync to weekly if there
+  const dhEl=document.getElementById(`dh_${w}_${eid}_${d}`);
+  if(dhEl){dhEl.textContent=h===0?'—':h.toFixed(1);dhEl.className='dh'+(h===0?' zero':'');}
+  // update weekly wsb
+  updateWsb(parseInt(w));
+  saveState();
+}
+
+function toggleOff(w,eid,d){
+  const a=getAtt(parseInt(w),eid,parseInt(d));
+  a.off=!a.off;
+  if(a.off){a.in='';a.out='';}
+  const card=document.getElementById(`der_${w}_${eid}_${d}`);
+  if(card){
+    const newCard=buildDailyRow(S.employees.find(e=>e.id===eid),parseInt(w),parseInt(d));
+    card.replaceWith(newCard);
+  }
+  refreshDailyKPI(parseInt(w),parseInt(d));
+  updateWsb(parseInt(w));
+  saveState();
+}
+
+// ─── TIME POPUP ───
+function buildTimePopup(){
+  const hc=document.getElementById('tpHours');
+  const mc=document.getElementById('tpMins');
+  for(let h=0;h<24;h++){
+    const d=document.createElement('div');
+    d.className='tp-item';d.dataset.h=h;
+    d.textContent=String(h).padStart(2,'0');
+    d.onclick=()=>selectTPH(h);hc.appendChild(d);
+  }
+  for(let m=0;m<60;m+=5){
+    const d=document.createElement('div');
+    d.className='tp-item';d.dataset.m=m;
+    d.textContent=String(m).padStart(2,'0');
+    d.onclick=()=>selectTPM(m);mc.appendChild(d);
+  }
+}
+function selectTPH(h){
+  tpSelH=h;
+  document.querySelectorAll('#tpHours .tp-item').forEach(i=>i.classList.toggle('sel',parseInt(i.dataset.h)===h));
+}
+function selectTPM(m){
+  tpSelM=m;
+  document.querySelectorAll('#tpMins .tp-item').forEach(i=>i.classList.toggle('sel',parseInt(i.dataset.m)===m));
+}
+function openTimePop(inputId,evt){
+  evt.stopPropagation();
+  tpTarget=inputId;
+  const inp=document.getElementById(inputId);
+  const pop=document.getElementById('timePopup');
+  // parse existing value
+  const parts=(inp.value||'').split(':');
+  tpSelH=parts[0]?parseInt(parts[0]):null;
+  tpSelM=parts[1]?parseInt(parts[1]):null;
+  document.querySelectorAll('#tpHours .tp-item').forEach(i=>i.classList.toggle('sel',parseInt(i.dataset.h)===tpSelH));
+  document.querySelectorAll('#tpMins .tp-item').forEach(i=>i.classList.toggle('sel',parseInt(i.dataset.m)===tpSelM));
+  // position near button
+  const rect=evt.target.getBoundingClientRect();
+  pop.style.top=(rect.bottom+window.scrollY+4)+'px';
+  pop.style.left=Math.min(rect.left,window.innerWidth-220)+'px';
+  pop.classList.add('show');
+  // scroll to selected
+  if(tpSelH!==null){
+    const hEl=document.querySelector(`#tpHours .tp-item[data-h="${tpSelH}"]`);
+    if(hEl)hEl.scrollIntoView({block:'center'});
+  }
+  if(tpSelM!==null){
+    const mEl=document.querySelector(`#tpMins .tp-item[data-m="${tpSelM}"]`);
+    if(mEl)mEl.scrollIntoView({block:'center'});
+  }
+}
+function confirmTimePop(){
+  if(tpTarget&&tpSelH!==null&&tpSelM!==null){
+    const val=String(tpSelH).padStart(2,'0')+':'+String(tpSelM).padStart(2,'0');
+    const inp=document.getElementById(tpTarget);
+    if(inp){
+      inp.value=val;
+      inp.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+  }
+  closeTimePop();
+}
+function closeTimePop(){document.getElementById('timePopup').classList.remove('show');}
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('timePopup');
+  if(pop.classList.contains('show')&&!pop.contains(e.target)){closeTimePop();}
+});
+
+// ─── WEEKLY VIEW ───
+function renderWeek(){
+  const w=S.curWeek;
+  const totH=weekTotH(w),totRev=weekRev(w);
+  document.getElementById('weekSumBar').innerHTML=`
+    <div class="wsb-item"><div class="wsb-lbl">週總時數</div><div class="wsb-val">${totH.toFixed(1)}h</div></div>
+    <div class="wsb-item"><div class="wsb-lbl">人數</div><div class="wsb-val">${S.employees.length}</div></div>
+    <div class="wsb-item"><div class="wsb-lbl">本週營業額</div><div class="wsb-val">$${totRev.toLocaleString()}</div></div>`;
+
+  // Date header showing actual calendar dates and DOW
+  const dates=[];
+  for(let d=0;d<7;d++) dates.push(getDate(w,d));
+  document.getElementById('weekDateHdr').innerHTML=`
+    <div class="date-hdr-lbl">本週</div>
+    <div class="dchips">${dates.map((date,di)=>`
+      <div class="dchip${isWE(date)?' we':''}">${fmt(date)}<br><span style="font-size:8px;">${dowName(date)}</span></div>`).join('')}
+    </div>`;
+
+  const list=document.getElementById('weekEmpList');list.innerHTML='';
+  S.employees.forEach(emp=>list.appendChild(buildWeekCard(emp,w,dates)));
+  renderRevCard('weekRevCard',w);
+}
+
+function buildWeekCard(emp,w,dates){
+  const card=document.createElement('div');
+  card.className='emp-card';
+  card.id=`ec_${w}_${emp.id}`;
+  const wkH=empWeekH(emp.id,w);
+  card.innerHTML=`
+    <div class="ec-head" onclick="toggleEc('${w}','${emp.id}')">
+      <div class="ec-badge">${emp.name.charAt(0)}</div>
+      <div class="ec-name">${emp.name}</div>
+      <div class="ec-rank">${rankLabel(emp)}</div>
+      <div class="ec-wktot" id="ecwt_${w}_${emp.id}">${wkH.toFixed(1)}h</div>
+      <button class="ec-gear" onclick="event.stopPropagation();showEditModal('${emp.id}')">⚙</button>
+      <svg class="ec-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg>
+    </div>
+    <div class="ec-body">
+      <div class="ec-col-hdr">
+        <div class="ec-col-lbl">日期</div>
+        <div class="ec-col-lbl">上班</div>
+        <div class="ec-col-lbl">下班</div>
+        <div class="ec-col-lbl">休息</div>
+        <div class="ec-col-lbl">時數</div>
+      </div>
+      ${dates.map((date,di)=>buildWeekDayRow(emp.id,w,di,date)).join('')}
+    </div>`;
+  return card;
+}
+
+function buildWeekDayRow(eid,w,di,date){
+  const a=getAtt(w,eid,di);
+  const h=a.off?0:calcH(a.in,a.out,a.brk);
+  const we=isWE(date);
+  return `<div class="day-row">
+    <div class="day-lbl${we?' we':''}">
+      ${dowName(date)}<br><span class="day-dt">${fmt(date)}</span>
+    </div>
+    <input class="wk-time-inp" type="text" value="${a.off?'':a.in}" placeholder="--:--"
+      ${a.off?'disabled':''} maxlength="5" inputmode="numeric"
+      oninput="formatTimeInput(this)"
+      onchange="onWeekInput('${w}','${eid}','${di}','in',this.value)">
+    <input class="wk-time-inp" type="text" value="${a.off?'':a.out}" placeholder="--:--"
+      ${a.off?'disabled':''} maxlength="5" inputmode="numeric"
+      oninput="formatTimeInput(this)"
+      onchange="onWeekInput('${w}','${eid}','${di}','out',this.value)">
+    <input class="wk-brk-inp" type="number" min="0" max="4" step="0.5"
+      value="${a.off?'':a.brk}" placeholder="0" ${a.off?'disabled':''}
+      onchange="onWeekInput('${w}','${eid}','${di}','brk',this.value)">
+    <div class="dh${h===0?' zero':''}" id="dh_${w}_${eid}_${di}">${h===0?'—':h.toFixed(1)}</div>
+  </div>`;
+}
+
+function onWeekInput(w,eid,di,field,val){
+  const a=getAtt(parseInt(w),eid,parseInt(di));
+  a[field]=val;
+  const h=calcH(a.in,a.out,a.brk);
+  const el=document.getElementById(`dh_${w}_${eid}_${di}`);
+  if(el){el.textContent=h===0?'—':h.toFixed(1);el.className='dh'+(h===0?' zero':'');}
+  updateWsb(parseInt(w));
+  // sync daily view
+  const dEl=document.getElementById(`dH_${w}_${eid}_${di}`);
+  if(dEl){dEl.textContent=h===0?'—':h.toFixed(1)+'h';dEl.className='der-h-val'+(h===0?' zero':'');}
+  saveState();
+}
+
+function updateWsb(w){
+  const totH=weekTotH(w),totRev=weekRev(w);
+  const sb=document.getElementById('weekSumBar');
+  if(sb)sb.innerHTML=`
+    <div class="wsb-item"><div class="wsb-lbl">週總時數</div><div class="wsb-val">${totH.toFixed(1)}h</div></div>
+    <div class="wsb-item"><div class="wsb-lbl">人數</div><div class="wsb-val">${S.employees.length}</div></div>
+    <div class="wsb-item"><div class="wsb-lbl">本週營業額</div><div class="wsb-val">$${totRev.toLocaleString()}</div></div>`;
+  // update ec week total
+  S.employees.forEach(emp=>{
+    const h=empWeekH(emp.id,w);
+    const e=document.getElementById(`ecwt_${w}_${emp.id}`);
+    if(e)e.textContent=h.toFixed(1)+'h';
+  });
+}
+
+function toggleEc(w,eid){document.getElementById(`ec_${w}_${eid}`)?.classList.toggle('collapsed');}
+
+// ─── REVENUE CARD (weekly) ───
+function renderRevCard(containerId,w){
+  const c=document.getElementById(containerId);if(!c)return;
+  // aggregate daily rev per week
+  let barleyTotal=0,cloudTotal=0;
+  for(let d=0;d<7;d++){const r=getDailyRev(w,d);barleyTotal+=(parseFloat(r.barley)||0);cloudTotal+=(parseFloat(r.cloud)||0);}
+  const tot=barleyTotal+cloudTotal;
+  c.innerHTML=`
+    <div class="rev-title" style="margin-bottom:9px;">本週營業額（由每日自動加總）</div>
+    <div class="rev-grid">
+      <div class="ri"><div class="ri-lbl">大麥合計</div><div class="ri-total">$${barleyTotal.toLocaleString()}</div></div>
+      <div class="ri"><div class="ri-lbl">雲端合計</div><div class="ri-total">$${cloudTotal.toLocaleString()}</div></div>
+      <div class="ri"><div class="ri-lbl">本週總計</div><div class="ri-total" style="color:var(--inkB);">$${tot.toLocaleString()}</div></div>
+    </div>`;
+}
+
+// ─── SUMMARY ───
+function renderSummary(){
+  const tbody=document.getElementById('sumBody');tbody.innerHTML='';
+  let totPay=0;
+  const stdH=monthStdH();
+  S.employees.forEach(emp=>{
+    const lv=getLv(emp.id);
+    const wh=Array.from({length:5},(_,w)=>empWeekH(emp.id,w));
+    const rawTot=wh.reduce((a,b)=>a+b,0);
+    const annualH=(parseFloat(lv.annual)||0)*8;
+    const publicH=(parseFloat(lv.public)||0)*8;
+    const sickH=(parseFloat(lv.sick)||0);
+    const supportH=(parseFloat(lv.support)||0);
+    const effH=rawTot+annualH+publicH+sickH+supportH;
+    const pay=empPay(emp);totPay+=pay;
+
+    // Pay detail string
+    let payDetail='';
+    if(emp.type==='full'){
+      if(effH>stdH){
+        const otH=(effH-stdH).toFixed(1);
+        const hrRate=(emp.wage/stdH).toFixed(0);
+        payDetail=`<div style="font-size:9px;color:var(--redL);margin-top:2px;">OT ${otH}h × $${hrRate}</div>`;
+      }
+    } else {
+      payDetail=`<div style="font-size:9px;color:var(--inkS);margin-top:2px;">${effH.toFixed(1)}h × $${emp.wage}</div>`;
+    }
+
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${emp.name}<br><span style="font-size:10px;color:var(--inkS);font-family:inherit;">${rankLabel(emp)}</span></td>
+      ${wh.map(h=>`<td style="color:${h>0?'var(--ink)':'var(--inkF)'}">${h>0?h.toFixed(1):'—'}</td>`).join('')}
+      <td class="col-tot">${rawTot.toFixed(1)}</td>
+      <td><input class="lv-inp" type="number" min="0" step="1" value="${lv.annual}" placeholder="0" onchange="onLv('${emp.id}','annual',this.value)"><div style="font-size:9px;color:var(--inkS);text-align:center;">${annualH?'='+annualH+'h':''}</div></td>
+      <td><input class="lv-inp" type="number" min="0" step="1" value="${lv.public}" placeholder="0" onchange="onLv('${emp.id}','public',this.value)"><div style="font-size:9px;color:var(--inkS);text-align:center;">${publicH?'='+publicH+'h':''}</div></td>
+      <td><input class="lv-inp" type="number" min="0" step="0.5" value="${lv.sick}" placeholder="0" onchange="onLv('${emp.id}','sick',this.value)"></td>
+      <td><input class="lv-inp" type="number" min="0" step="0.5" value="${lv.support}" placeholder="0" onchange="onLv('${emp.id}','support',this.value)"></td>
+      <td class="col-tot">${effH.toFixed(1)}${emp.type==='full'&&effH>stdH?`<div style="font-size:9px;color:var(--redL);">+OT</div>`:''}</td>
+      <td class="col-pay">$${Math.round(pay).toLocaleString()}${payDetail}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Standard hours note
+  const days=new Date(S.year,S.month,0).getDate();
+  document.getElementById('stdHNote').textContent=`本月標準工時基準：(${days}天 - 8) × 8 = ${stdH}h`;
+
+  const totH=Array.from({length:5},(_,w)=>weekTotH(w)).reduce((a,b)=>a+b,0);
+  const totRev=monthTotRev();const totPayF=monthTotPay();
+  const ratio=totRev>0?(totPayF/totRev*100).toFixed(1):null;
+  document.getElementById('mtH').textContent=totH.toFixed(1)+'h';
+  document.getElementById('mtPay').textContent='$'+Math.round(totPayF).toLocaleString();
+  document.getElementById('mtRev').textContent='$'+Math.round(totRev).toLocaleString();
+  const re=document.getElementById('mtRatio');
+  re.textContent=ratio?ratio+'%':'—';re.className='mt-val'+(ratio&&parseFloat(ratio)>35?' warn':'');
+}
+function onLv(eid,field,val){const lv=getLv(eid);lv[field]=parseFloat(val)||0;saveState();renderSummary();}
+
+// ─── EMPLOYEE MODAL ───
+function buildRankGrid(){
+  const g=document.getElementById('rankGrid');g.innerHTML='';
+  RANKS.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='rp-btn';b.dataset.key=r.key;
+    b.innerHTML=`<span class="rp-rank">${r.label}</span><span class="rp-wage">$${r.wage.toLocaleString()}</span>`;
+    b.onclick=()=>selRank(r.key,r.wage);
+    g.appendChild(b);
+  });
+}
+function selRank(key,wage){
+  selRankKey=key;
+  document.querySelectorAll('.rp-btn').forEach(b=>b.classList.toggle('sel',b.dataset.key===key));
+  document.getElementById('empWageFull').value=wage;
+}
+function onEmpTypeChange(){
+  const t=document.getElementById('empType').value;
+  document.getElementById('fullSection').style.display=t==='full'?'block':'none';
+  document.getElementById('partSection').style.display=t==='part'?'block':'none';
+}
+
+function showAddModal(){
+  editEmpId=null;selRankKey=null;isBatchMode=false;batchAdded=[];
+  document.getElementById('empModalTitle').textContent='新增員工';
+  document.getElementById('empModalDesc').textContent='設定姓名、職級與薪資。';
+  document.getElementById('batchBar').style.display='none';
+  document.getElementById('batchList').style.display='none';
+  document.getElementById('normalBtns').style.display='flex';
+  document.getElementById('batchBtns').style.display='none';
+  document.getElementById('empDelRow').style.display='none';
+  resetEmpForm();
+  document.getElementById('empModal').classList.add('show');
+  setTimeout(()=>document.getElementById('empName').focus(),300);
+}
+
+function startBatchMode(){
+  // save current entry first if name filled
+  const name=document.getElementById('empName').value.trim();
+  if(name){
+    if(!doSaveEmp())return; // validation failed
+  }
+  isBatchMode=true;
+  document.getElementById('empModalTitle').textContent='連續新增員工';
+  document.getElementById('empModalDesc').textContent='每次儲存後自動清空，繼續輸入下一位。';
+  document.getElementById('batchBar').style.display='flex';
+  document.getElementById('normalBtns').style.display='none';
+  document.getElementById('batchBtns').style.display='flex';
+  document.getElementById('empDelRow').style.display='none';
+  updateBatchUI();
+  resetEmpForm();
+  setTimeout(()=>document.getElementById('empName').focus(),100);
+}
+
+function closeBatchMode(){
+  isBatchMode=false;batchAdded=[];
+  closeEmpModal();
+  saveState();
+  renderAll();
+}
+
+function updateBatchUI(){
+  document.getElementById('batchCount').textContent=`已新增 ${batchAdded.length} 位`;
+  const listEl=document.getElementById('batchList');
+  if(batchAdded.length>0){
+    listEl.style.display='block';
+    listEl.innerHTML=batchAdded.map((e,i)=>
+      `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;
+        background:var(--bg2);border-bottom:1px solid var(--lineS);font-size:12px;">
+        <span style="font-family:'Courier New',monospace;font-size:10px;color:var(--inkF);">${String(i+1).padStart(2,'0')}</span>
+        <span style="color:var(--inkB);font-weight:700;flex:1;">${e.name}</span>
+        <span style="color:var(--gold);font-size:10px;">${rankLabel(e)}</span>
+      </div>`
+    ).join('');
+  } else {
+    listEl.style.display='none';
+  }
+}
+
+function resetEmpForm(){
+  document.getElementById('empName').value='';
+  document.getElementById('empType').value='part';
+  document.getElementById('empWageFull').value='';
+  document.getElementById('empWagePart').value='';
+  selRankKey=null;
+  document.querySelectorAll('.rp-btn').forEach(b=>b.classList.remove('sel'));
+  onEmpTypeChange();
+}
+
+function showEditModal(eid){
+  editEmpId=eid;selRankKey=null;isBatchMode=false;batchAdded=[];
+  const emp=S.employees.find(e=>e.id===eid);if(!emp)return;
+  document.getElementById('empModalTitle').textContent='編輯員工';
+  document.getElementById('empModalDesc').textContent='修改員工資料。';
+  document.getElementById('batchBar').style.display='none';
+  document.getElementById('batchList').style.display='none';
+  document.getElementById('normalBtns').style.display='flex';
+  document.getElementById('batchBtns').style.display='none';
+  document.getElementById('empName').value=emp.name;
+  document.getElementById('empType').value=emp.type;
+  if(emp.type==='full'){
+    document.getElementById('empWageFull').value=emp.wage;
+    selRankKey=emp.rank;
+    document.querySelectorAll('.rp-btn').forEach(b=>b.classList.toggle('sel',b.dataset.key===emp.rank));
+  } else {
+    document.getElementById('empWagePart').value=emp.wage;
+    document.querySelectorAll('.rp-btn').forEach(b=>b.classList.remove('sel'));
+  }
+  document.getElementById('empDelRow').style.display='block';
+  onEmpTypeChange();
+  document.getElementById('empModal').classList.add('show');
+}
+
+function closeEmpModal(){
+  document.getElementById('empModal').classList.remove('show');
+  isBatchMode=false;batchAdded=[];
+}
+
+// Core save logic — returns true on success, false on validation fail
+function doSaveEmp(){
+  const name=document.getElementById('empName').value.trim();
+  const type=document.getElementById('empType').value;
+  if(!name){showToast('請輸入員工姓名');return false;}
+  let wage=0,rank=null;
+  if(type==='full'){
+    wage=parseFloat(document.getElementById('empWageFull').value)||0;
+    rank=selRankKey;
+    if(!rank){showToast('請選擇職級');return false;}
+    if(!wage){showToast('請確認底薪');return false;}
+  } else {
+    wage=parseFloat(document.getElementById('empWagePart').value)||0;
+    if(!wage){showToast('請輸入時薪');return false;}
+  }
+  if(editEmpId){
+    const emp=S.employees.find(e=>e.id===editEmpId);
+    if(emp){emp.name=name;emp.type=type;emp.wage=wage;emp.rank=rank;}
+  } else {
+    const newEmp={id:'e'+Date.now()+Math.random().toString(36).slice(2,6),name,type,wage,rank};
+    S.employees.push(newEmp);
+    if(isBatchMode)batchAdded.push(newEmp);
+  }
+  return true;
+}
+
+function saveEmp(isBatch){
+  if(!doSaveEmp())return;
+  if(isBatch){
+    // stay open, reset form, focus name
+    updateBatchUI();
+    resetEmpForm();
+    setTimeout(()=>document.getElementById('empName').focus(),50);
+    saveState();
+    showToast('已新增，繼續輸入下一位');
+  } else {
+    closeEmpModal();
+    saveState();
+    renderAll();
+    showToast(editEmpId?'已更新員工資料':'已新增員工');
+  }
+}
+
+function deleteEmp(){
+  if(!editEmpId)return;
+  const emp=S.employees.find(e=>e.id===editEmpId);if(!emp)return;
+  if(!confirm(`確定刪除 ${emp.name}？`))return;
+  S.employees=S.employees.filter(e=>e.id!==editEmpId);
+  Object.values(S.att).forEach(w=>delete w[editEmpId]);
+  delete S.leaves[editEmpId];
+  closeEmpModal();saveState();renderAll();showToast('已刪除 '+emp.name);
+}
+
+// ─── RESET MODAL ───
+function showResetModal(){document.getElementById('resetModal').classList.add('show');}
+function closeResetModal(){document.getElementById('resetModal').classList.remove('show');}
+function confirmReset(){
+  // Clear att, dailyRev, leaves — keep employees and avgWage
+  S.att={};
+  S.dailyRev={};
+  S.leaves={};
+  closeResetModal();
+  saveState();
+  renderAll();
+  showToast('✓ 資料已重置，員工名單保留');
+}
+
+// ─── EXPORT ───
+function buildReportHtml(){
+  const store=document.getElementById('metaStore').value||'未填寫';
+  const mgr=document.getElementById('metaMgr').value||'未填寫';
+  const y=S.year,m=S.month;
+  const totH=Array.from({length:5},(_,w)=>weekTotH(w)).reduce((a,b)=>a+b,0);
+  const totPay=monthTotPay(),totRev=monthTotRev();
+  const ratio=totRev>0?(totPay/totRev*100).toFixed(1):null;
+  const rColor=ratio&&parseFloat(ratio)>35?'#B83A2E':'#5C7A3A';
+  const now=new Date().toLocaleString('zh-TW');
+  const stdH=monthStdH();
+  const days=new Date(S.year,S.month,0).getDate();
+  const empRows=S.employees.map(emp=>{
+    const wh=Array.from({length:5},(_,w)=>empWeekH(emp.id,w));
+    const lv=getLv(emp.id);
+    const rawTot=wh.reduce((a,b)=>a+b,0);
+    const annualH=(parseFloat(lv.annual)||0)*8;
+    const publicH=(parseFloat(lv.public)||0)*8;
+    const sickH=(parseFloat(lv.sick)||0);
+    const supportH=(parseFloat(lv.support)||0);
+    const effH=rawTot+annualH+publicH+sickH+supportH;
+    const pay=empPay(emp);
+    let payNote='';
+    if(emp.type==='full'&&effH>stdH){
+      const otH=(effH-stdH).toFixed(1);const hr=(emp.wage/stdH).toFixed(0);
+      payNote=`<br><span style="font-size:10px;color:#B83A2E;">OT ${otH}h×$${hr}</span>`;
+    } else if(emp.type==='part'){
+      payNote=`<br><span style="font-size:10px;color:#888;">${effH.toFixed(1)}h×$${emp.wage}</span>`;
+    }
+    return `<tr>
+      <td style="padding:7px 10px;border-bottom:1px solid #EEE;font-size:13px;color:#1a1a1a;font-weight:600;">${emp.name}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid #EEE;font-size:11px;color:#888;text-align:center;">${rankLabel(emp)}</td>
+      ${wh.map(h=>`<td style="padding:7px 8px;border-bottom:1px solid #EEE;font-size:12px;font-family:'Courier New',monospace;text-align:center;color:${h>0?'#1a1a1a':'#ccc'}">${h>0?h.toFixed(1):'—'}</td>`).join('')}
+      <td style="padding:7px 8px;border-bottom:1px solid #EEE;font-size:13px;font-family:'Courier New',monospace;text-align:center;font-weight:700;">${effH.toFixed(1)}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #EEE;font-size:13px;font-family:'Courier New',monospace;text-align:right;font-weight:700;color:#B83A2E;">$${Math.round(pay).toLocaleString()}${payNote}</td></tr>`;
+  }).join('');
+  return `<div style="background:#fff;font-family:'Noto Serif TC','PingFang TC',serif;max-width:720px;padding:40px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid #0E0E0E;">
+      <div><div style="font-size:9px;letter-spacing:4px;color:#888;font-weight:600;">GOOD PARTNER COFFEE · HR REPORT</div>
+        <div style="font-size:22px;font-weight:700;letter-spacing:3px;color:#0E0E0E;margin-top:4px;">人事工時報告</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">${store} · ${mgr}</div></div>
+      <div style="font-size:22px;font-weight:700;color:#0E0E0E;font-family:'Courier New',monospace;">${y}年${m}月</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px;">
+      ${[['總工時',totH.toFixed(1)+'h','#0E0E0E'],['總薪資','$'+Math.round(totPay).toLocaleString(),'#B83A2E'],
+         ['總營業額','$'+Math.round(totRev).toLocaleString(),'#0E0E0E'],['人事占比',ratio?ratio+'%':'—',rColor]]
+        .map(([l,v,c])=>`<div style="background:#FAFAFA;border:1px solid #E4E4E4;padding:14px;text-align:center;">
+          <div style="font-size:9px;color:#888;letter-spacing:2px;font-weight:600;margin-bottom:6px;">${l}</div>
+          <div style="font-size:19px;font-weight:700;font-family:'Courier New',monospace;color:${c};">${v}</div></div>`).join('')}
+    </div>
+    <h2 style="font-size:14px;letter-spacing:3px;margin:0 0 10px;padding-left:10px;border-left:4px solid #0E0E0E;color:#1a1a1a;">員工工時明細</h2>
+    <table style="width:100%;border-collapse:collapse;background:#FAFAFA;border:1px solid #E4E4E4;margin-bottom:16px;">
+      <thead><tr style="background:#E8E4DC;">
+        <th style="padding:9px 10px;text-align:left;border-bottom:1px solid #E4E4E4;font-size:11px;font-weight:700;">姓名</th>
+        <th style="padding:9px 8px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #E4E4E4;">職級</th>
+        ${['W1','W2','W3','W4','W5'].map(w=>`<th style="padding:9px 8px;text-align:center;font-size:10px;font-weight:700;border-bottom:1px solid #E4E4E4;">${w}</th>`).join('')}
+        <th style="padding:9px 8px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #E4E4E4;">實計h</th>
+        <th style="padding:9px 10px;text-align:right;font-size:11px;font-weight:700;border-bottom:1px solid #E4E4E4;">薪水</th>
+      </tr></thead>
+      <tbody>${empRows}</tbody>
+      <tfoot><tr style="background:#E8E4DC;">
+        <td colspan="7" style="padding:9px 10px;font-size:12px;letter-spacing:2px;font-weight:700;">合計</td>
+        <td style="padding:9px 8px;text-align:center;font-family:'Courier New',monospace;font-size:14px;font-weight:700;">${totH.toFixed(1)}</td>
+        <td style="padding:9px 10px;text-align:right;font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:#B83A2E;">$${Math.round(totPay).toLocaleString()}</td>
+      </tr></tfoot>
+    </table>
+    <div style="margin-top:16px;padding:10px 14px;background:#F4F4F0;border:1px solid #E4E4E4;font-size:10px;color:#888;">
+      本月標準工時基準：(${days}天 − 8) × 8 ＝ ${stdH}h ／ 正職超時依比例計算加班費 ／ 兼職依實計時數計算
+    </div>
+    <div style="margin-top:20px;padding-top:12px;border-top:2px solid #0E0E0E;display:flex;justify-content:space-between;">
+      <div style="font-weight:700;letter-spacing:3px;font-size:11px;">好夥伴咖啡 · 人事管理系統</div>
+      <div style="font-size:10px;color:#888;">產出：${now}</div>
+    </div>
+  </div>`;
+}
+async function generateReport(){
+  document.getElementById('loadModal').classList.add('show');
+  try{
+    const area=document.getElementById('pdfRenderArea');
+    area.innerHTML=buildReportHtml();
+    await new Promise(r=>setTimeout(r,200));
+    const canvas=await html2canvas(area.firstElementChild,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    const dataUrl=canvas.toDataURL('image/png');
+    area.innerHTML='';
+    const store=document.getElementById('metaStore').value||'巨蛋';
+    document.getElementById('prevImg').src=dataUrl;
+    document.getElementById('dlBtn').href=dataUrl;
+    document.getElementById('dlBtn').download=`${store}_人事工時_${S.year}年${S.month}月.png`;
+    document.getElementById('imgPreview').classList.add('show');
+  }catch(err){showToast('產生失敗：'+err.message);}
+  finally{document.getElementById('loadModal').classList.remove('show');}
+}
+function closeImgPreview(){document.getElementById('imgPreview').classList.remove('show');}
+// ─── COPY MODAL ───
+let copyUnit='day';
+let copyTextCache='';
+
+function openCopyModal(){
+  copyUnit=S.view==='summary'?'month':(S.view==='week'?'week':'day');
+  ['day','week','month'].forEach(u=>{
+    document.getElementById('cu'+u.charAt(0).toUpperCase()+u.slice(1)).classList.toggle('active',u===copyUnit);
+  });
+  buildCopyPreview();
+  document.getElementById('copyModal').classList.add('show');
+}
+function closeCopyModal(){document.getElementById('copyModal').classList.remove('show');}
+function setCopyUnit(u){
+  copyUnit=u;
+  ['day','week','month'].forEach(k=>{
+    document.getElementById('cu'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('active',k===u);
+  });
+  buildCopyPreview();
+}
+
+function buildCopyPreview(){
+  const store=document.getElementById('metaStore').value||'（未填寫）';
+  const mgr=document.getElementById('metaMgr').value||'';
+  const y=S.year,m=S.month;
+  let txt='';
+
+  if(copyUnit==='day'){
+    const w=S.curWeek,d=S.curDay;
+    const date=getDate(w,d);
+    const dateStr=`${y}年${m}月${date.getDate()}日（${dowFull(date)}）`;
+    const totH=dayTotH(w,d);
+    const r=getDailyRev(w,d);
+    const barley=parseFloat(r.barley)||0;
+    const cloud=parseFloat(r.cloud)||0;
+    const totRev=barley+cloud;
+    const avgW=S.avgWage;
+    const laborCost=totRev>0?((totH*avgW)/totRev*100).toFixed(1):null;
+    const headcount=totH>0?(totH/8):null;
+    const perPerson=headcount&&totRev>0?Math.round(totRev/headcount):null;
+
+    // Header
+    txt+=`【${store}】${dateStr}${mgr?' · '+mgr:''}\n`;
+    txt+=`────────────────\n`;
+    txt+=`大麥營業額：$${barley.toLocaleString()}\n`;
+    txt+=`雲端營業額：$${cloud.toLocaleString()}\n`;
+    txt+=`當日總營業額：$${totRev.toLocaleString()}\n`;
+    txt+=`────────────────\n`;
+    txt+=`當日出勤總時數：${totH.toFixed(1)}h\n\n`;
+    txt+=`人事成本占比：${laborCost?laborCost+'%':'—'}\n`;
+    txt+=`人均產值：${perPerson?'$'+perPerson.toLocaleString():'—'}\n`;
+    txt+=`────────────────\n`;
+
+    // Per-employee hours + estimated pay
+    const present=S.employees.filter(e=>{const a=getAtt(w,e.id,d);return !a.off&&(a.in||a.out);});
+    const absent=S.employees.filter(e=>getAtt(w,e.id,d).off);
+
+    if(present.length>0){
+      present.forEach(e=>{
+        const a=getAtt(w,e.id,d);
+        const h=calcH(a.in,a.out,a.brk);
+        // Estimated daily pay
+        let estPay='';
+        if(e.type==='part'){
+          estPay=`初估 $${Math.round(h*e.wage).toLocaleString()}`;
+        } else {
+          const stdH=monthStdH();
+          const dailyBase=Math.round(e.wage/new Date(S.year,S.month,0).getDate());
+          estPay=`初估 $${dailyBase.toLocaleString()}`;
+        }
+        txt+=`${e.name}　${h>0?h.toFixed(1)+'h':'—'}　${estPay}\n`;
+      });
+    } else {
+      txt+=`（今日無出勤紀錄）\n`;
+    }
+    if(absent.length>0){
+      txt+=`\n休假：${absent.map(e=>e.name).join('、')}\n`;
+    }
+
+  } else if(copyUnit==='week'){
+    const w=S.curWeek;
+    const dates=Array.from({length:7},(_,d)=>getDate(w,d));
+    const startFmt=`${dates[0].getMonth()+1}/${dates[0].getDate()}`;
+    const endFmt=`${dates[6].getMonth()+1}/${dates[6].getDate()}`;
+    const totH=weekTotH(w);
+    const totRev=weekRev(w);
+
+    txt+=`【${store} 週次報告】第${w+1}週\n`;
+    txt+=`${y}年${m}月 ${startFmt}～${endFmt}${mgr?' · '+mgr:''}\n`;
+    txt+=`────────────────\n`;
+    txt+=`本週總工時：${totH.toFixed(1)}h\n`;
+    txt+=`本週總營業額：$${totRev.toLocaleString()}\n`;
+    txt+=`────────────────\n`;
+    // Daily breakdown
+    for(let d=0;d<7;d++){
+      const date=dates[d];
+      const dH=dayTotH(w,d);
+      const dRev=dayTotRev(w,d);
+      const dStr=`${date.getMonth()+1}/${date.getDate()}（${dowName(date)}）`;
+      txt+=`${dStr}　${dH>0?dH.toFixed(1)+'h':'—'}　$${dRev>0?dRev.toLocaleString():'—'}\n`;
+    }
+    txt+=`────────────────\n`;
+    S.employees.forEach(e=>{
+      const h=empWeekH(e.id,w);
+      if(h>0)txt+=`${e.name}　${h.toFixed(1)}h\n`;
+    });
+
+  } else {
+    // month
+    const totH=Array.from({length:5},(_,w)=>weekTotH(w)).reduce((a,b)=>a+b,0);
+    const totPay=monthTotPay(),totRev=monthTotRev();
+    const ratio=totRev>0?(totPay/totRev*100).toFixed(1)+'%':'—';
+    const stdH=monthStdH();
+
+    txt+=`【${store} 月度人事報告】\n`;
+    txt+=`${y}年${m}月${mgr?' · '+mgr:''}\n`;
+    txt+=`────────────────\n`;
+    txt+=`本月總工時：${totH.toFixed(1)}h\n`;
+    txt+=`本月總薪資：$${Math.round(totPay).toLocaleString()}\n`;
+    txt+=`本月總營業額：$${Math.round(totRev).toLocaleString()}\n`;
+    txt+=`人事占比：${ratio}\n`;
+    txt+=`標準工時基準：${stdH}h\n`;
+    txt+=`────────────────\n`;
+    S.employees.forEach(e=>{
+      const h=empMonthH(e.id);
+      const effH_=empEffH(e.id);
+      const pay=empPay(e);
+      const lv=getLv(e.id);
+      const hasLeave=(parseFloat(lv.annual)||0)+(parseFloat(lv.public)||0)+(parseFloat(lv.sick)||0)+(parseFloat(lv.support)||0);
+      let line=`${e.name}（${rankLabel(e)}）：${h.toFixed(1)}h`;
+      if(hasLeave)line+=`→實計${effH_.toFixed(1)}h`;
+      line+=` → $${Math.round(pay).toLocaleString()}`;
+      if(e.type==='full'&&effH_>stdH)line+=` ⚠OT`;
+      txt+=line+'\n';
+    });
+  }
+
+  copyTextCache=txt;
+  // Render preview with highlighted sections
+  const pre=document.getElementById('copyPreview');
+  pre.textContent=txt;
+}
+
+function confirmCopy(){
+  if(!copyTextCache){showToast('無內容可複製');return;}
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(copyTextCache)
+      .then(()=>{closeCopyModal();showToast('✓ 已複製到剪貼簿');})
+      .catch(()=>fbCopy(copyTextCache));
+  } else {
+    fbCopy(copyTextCache);
+    closeCopyModal();
+  }
+}
+function fbCopy(t){
+  const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');showToast('已複製');}catch{showToast('複製失敗');}
+  document.body.removeChild(ta);
+}
+function showToast(msg){
+  const el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2400);
+}
+init();
+</script>
+</body>
+</html>
