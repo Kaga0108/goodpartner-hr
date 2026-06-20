@@ -821,43 +821,62 @@ async function pushToCloud(){
       mgr:document.getElementById('metaMgr')?.value||'',
       employees:S.employees, att:S.att, dailyRev:S.dailyRev, leaves:S.leaves,
     };
-    const res=await fetch(GAS_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight on Apps Script
-      body:JSON.stringify(payload),
-      redirect:'follow',
-    });
-    if(!res.ok){
-      setSyncStatus('error', `HTTP ${res.status} ${res.statusText}\n（伺服器有回應，但狀態碼不是 200。常見原因：部署的「誰可以存取」沒設成「所有人」）`);
-      return;
-    }
-    let data;
-    try{
-      data = await res.json();
-    } catch(parseErr){
-      const raw = await res.text().catch(()=> '(無法讀取內容)');
-      setSyncStatus('error', `回應不是有效的 JSON。\n伺服器回傳內容開頭：\n${raw.slice(0,300)}\n\n常見原因：網址要求 Google 登入，或顯示 HTML 錯誤頁，而非 Apps Script 的 JSON 輸出。`);
-      return;
-    }
+    const dataStr = JSON.stringify(payload);
+    const url = GAS_URL + '?action=save&data=' + encodeURIComponent(dataStr);
+    const data = await jsonpRequest(url, 12000);
     if(data && data.ok){
       setSyncStatus('ok');
     } else {
-      setSyncStatus('error', `伺服器回傳錯誤：\n${(data&&data.error)||'未知錯誤（無 error 欄位）'}`);
+      setSyncStatus('error', `伺服器回傳錯誤：\n${(data&&data.error)||'未知錯誤（無 error 欄位）'}\n\n（JSONP 連線本身成功，是 Apps Script 程式內部出錯）`);
     }
   } catch(e){
-    // Probe: try a no-cors GET to distinguish "network truly unreachable"
-    // from "CORS/redirect specifically blocked the readable fetch".
-    let probeNote = '尚未測試';
-    try{
-      await fetch(GAS_URL+'?storeKey='+encodeURIComponent(STORE_KEY), {mode:'no-cors', cache:'no-store'});
-      probeNote = '✓ no-cors 探測請求有送達（代表網路本身通，問題出在 CORS/重新導向處理，而不是斷線）';
-    } catch(probeErr){
-      probeNote = '✗ no-cors 探測請求也失敗（代表是更底層的網路/連線問題，並非單純 CORS）';
-    }
-    setSyncStatus('error', `瀏覽器無法送出請求（network/fetch 例外）：\n${e.message||e}\n\n診斷探測結果：\n${probeNote}\n\n常見原因：\n1. 裝置沒有網路連線\n2. Safari 的隱私權設定封鎖了跨網域請求\n3. Apps Script 網址本身已失效或部署被刪除\n4. Apps Script 回應的轉址過程被瀏覽器中斷`);
+    setSyncStatus('error', `寫入雲端失敗（JSONP 例外）：\n${e.message||e}\n\n常見原因：\n1. 裝置沒有網路連線\n2. Apps Script 網址已失效或部署被刪除\n3. 部署的「誰可以存取」沒設成「所有人」\n4. 資料量過大超出網址長度限制（罕見，通常要幾百筆紀錄才會發生）`);
   } finally {
     syncInFlight=false;
   }
+}
+
+// JSONP loader — bypasses CORS entirely because <script src="..."> is not
+// subject to cross-origin read restrictions the way fetch() responses are.
+let jsonpCounter = 0;
+function jsonpRequest(url, timeoutMs){
+  return new Promise((resolve, reject)=>{
+    jsonpCounter++;
+    const cbName = '__gp_jsonp_cb_' + jsonpCounter;
+    const script = document.createElement('script');
+    let settled = false;
+
+    const cleanup = ()=>{
+      delete window[cbName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+      clearTimeout(timer);
+    };
+
+    window[cbName] = (data)=>{
+      if(settled) return;
+      settled = true;
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = ()=>{
+      if(settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error('JSONP <script> 載入失敗（可能是網址錯誤、部署被刪除，或網路完全不通）'));
+    };
+
+    const timer = setTimeout(()=>{
+      if(settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error('JSONP 請求逾時（伺服器在時限內沒有回應）'));
+    }, timeoutMs || 10000);
+
+    const sep = url.indexOf('?')>=0 ? '&' : '?';
+    script.src = url + sep + 'callback=' + cbName;
+    document.head.appendChild(script);
+  });
 }
 
 async function pullFromCloud(){
@@ -865,8 +884,7 @@ async function pullFromCloud(){
   try{
     setSyncStatus('syncing');
     const url=GAS_URL+'?storeKey='+encodeURIComponent(STORE_KEY);
-    const res=await fetch(url);
-    const data=await res.json();
+    const data=await jsonpRequest(url, 10000);
     if(data && data.ok && data.data){
       const d=data.data;
       if(d.year)S.year=d.year;
@@ -881,17 +899,14 @@ async function pullFromCloud(){
       setSyncStatus('ok');
       return true;
     }
+    if(data && !data.ok){
+      setSyncStatus('error', `伺服器回傳錯誤：\n${data.error||'未知錯誤'}\n\n（這代表 JSONP 連線本身成功了，是 Apps Script 程式內部出錯，例如試算表ID不對或分頁讀取失敗）`);
+      return false;
+    }
     setSyncStatus('idle');
     return false;
   } catch(e){
-    let probeNote = '尚未測試';
-    try{
-      await fetch(GAS_URL+'?storeKey='+encodeURIComponent(STORE_KEY), {mode:'no-cors', cache:'no-store'});
-      probeNote = '✓ no-cors 探測請求有送達（網路本身通，問題出在 CORS/讀取回應內容被擋）';
-    } catch(probeErr){
-      probeNote = '✗ no-cors 探測請求也失敗（更底層的網路/連線問題，並非單純 CORS）';
-    }
-    setSyncStatus('error', `下載資料失敗（network/fetch 例外）：\n${e.message||e}\n\n診斷探測結果：\n${probeNote}`);
+    setSyncStatus('error', `下載資料失敗（JSONP 例外）：\n${e.message||e}\n\n常見原因：\n1. 裝置沒有網路連線\n2. Apps Script 網址已失效或部署被刪除\n3. 部署的「誰可以存取」沒設成「所有人」\n\n（這個方式已不受 Safari 的 CORS 限制影響，如果仍失敗，問題不在瀏覽器安全機制，而是連線本身或伺服器端設定）`);
     return false;
   }
 }
