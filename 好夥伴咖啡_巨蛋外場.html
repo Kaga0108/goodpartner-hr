@@ -884,7 +884,14 @@ async function pullFromCloud(){
     setSyncStatus('idle');
     return false;
   } catch(e){
-    setSyncStatus('error', `下載資料失敗（network/fetch 例外）：\n${e.message||e}`);
+    let probeNote = '尚未測試';
+    try{
+      await fetch(GAS_URL+'?storeKey='+encodeURIComponent(STORE_KEY), {mode:'no-cors', cache:'no-store'});
+      probeNote = '✓ no-cors 探測請求有送達（網路本身通，問題出在 CORS/讀取回應內容被擋）';
+    } catch(probeErr){
+      probeNote = '✗ no-cors 探測請求也失敗（更底層的網路/連線問題，並非單純 CORS）';
+    }
+    setSyncStatus('error', `下載資料失敗（network/fetch 例外）：\n${e.message||e}\n\n診斷探測結果：\n${probeNote}`);
     return false;
   }
 }
